@@ -93,18 +93,30 @@
             0%, 80%, 100% { transform: scale(0); }
             40% { transform: scale(1); }
         }
+
+        .tab-active {
+            border-bottom: 2px solid #538253;
+            color: #2a422a;
+            font-weight: bold;
+        }
+        .tab-inactive {
+            color: #78716c;
+        }
+        .tab-inactive:hover {
+            color: #2a422a;
+        }
     </style>
     <!-- Chosen Palette: Olea Green (Nature/Growth) + Warm Stone (Academic/Serious) -->
     <!-- Application Structure Plan: 
          1. Header: Brand context.
          2. Filter/Control Bar: Sorting.
          3. Main Grid: University Cards.
-         4. Modal (The "Decoder"): Includes DNA Radar Chart AND NOW "AI Narrative Architect".
-         5. Comparison Tray: Includes Side-by-Side View AND NOW "AI Strategic Differentiator".
+         4. Modal (The "Decoder"): Includes DNA Radar Chart AND AI Tools (Narrative Architect, Activity Refiner, Live Intel).
+         5. Comparison Tray: Includes Side-by-Side View AND "AI Strategic Differentiator".
     -->
     <!-- Visualization & Content Choices:
          - Radar Chart (Chart.js): Visualizes the "DNA" instantly.
-         - AI Integration: Uses Gemini to generate "Spike" narratives based on the school's specific persona data.
+         - AI Integration: Uses Gemini to generate "Spike" narratives, refine activities, and fetch live data via Search Grounding.
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 </head>
@@ -173,9 +185,27 @@
                 </div>
 
                 <div class="mt-4">
-                    <button id="compare-btn" class="w-full py-2 bg-stone-800 text-white rounded hover:bg-stone-700 transition text-sm">
+                    <button id="compare-btn" class="w-full py-2 bg-stone-800 text-white rounded hover:bg-stone-700 transition text-sm mb-4">
                         <i class="fas fa-plus mr-2"></i> Add to Comparison
                     </button>
+                    
+                    <div class="bg-olea-50 p-4 rounded-md border border-olea-100">
+                        <div class="flex justify-between items-center mb-2">
+                            <h5 class="text-xs font-bold text-olea-800 uppercase"><i class="fas fa-microscope mr-1"></i> Evidence Markers</h5>
+                            <button onclick="fetchLatestIntel()" class="text-[10px] bg-white border border-olea-200 text-olea-700 px-2 py-1 rounded hover:bg-olea-100 transition" title="Use Google Search to find current prompts">
+                                ✨ Live Intel
+                            </button>
+                        </div>
+                        <ul id="modal-evidence" class="text-xs text-stone-700 space-y-2 list-disc pl-4 mb-2">
+                            <!-- Static Evidence -->
+                        </ul>
+                        <div id="intel-loader" class="hidden text-center py-2">
+                            <i class="fas fa-circle-notch fa-spin text-olea-500 text-xs"></i>
+                        </div>
+                        <div id="live-intel-result" class="hidden text-[10px] text-stone-600 border-t border-olea-200 pt-2 mt-2 leading-tight">
+                            <!-- Search results go here -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -198,13 +228,6 @@
                         <p id="modal-dna-desc" class="text-stone-600 text-sm leading-relaxed mb-4">
                             Analysis of why this persona fits.
                         </p>
-                        <div class="bg-olea-50 p-4 rounded-md border border-olea-100">
-                            <h5 class="text-xs font-bold text-olea-800 uppercase mb-2"><i class="fas fa-microscope mr-1"></i> Evidence Markers</h5>
-                            <ul id="modal-evidence" class="text-xs text-stone-700 space-y-2 list-disc pl-4">
-                                <li>Essay prompt analysis</li>
-                                <li>Strategic plan quote</li>
-                            </ul>
-                        </div>
                     </div>
 
                     <div>
@@ -214,7 +237,7 @@
                             Strategic advice on how to frame the narrative.
                         </p>
                         
-                        <div class="mt-6">
+                        <div class="mt-4">
                             <h5 class="text-xs font-bold text-stone-900 uppercase mb-2">Keyword Resonance</h5>
                             <div id="modal-keywords" class="flex flex-wrap gap-2">
                                 <!-- Keywords injected here -->
@@ -223,33 +246,55 @@
                     </div>
                 </div>
 
-                <!-- AI Section -->
-                <div class="mt-auto pt-6 border-t-2 border-stone-100">
-                    <div class="bg-gradient-to-r from-stone-50 to-olea-50 rounded-lg p-5 border border-olea-100 shadow-sm">
-                        <h4 class="text-sm font-bold text-olea-900 flex items-center gap-2 mb-2">
-                            <span>✨</span> The Narrative Architect
-                        </h4>
+                <!-- AI Section: Tabbed Interface -->
+                <div class="mt-auto pt-4 border-t-2 border-stone-100">
+                    <!-- Tabs -->
+                    <div class="flex gap-4 mb-3 border-b border-stone-200">
+                        <button onclick="switchAITab('narrative')" id="tab-narrative" class="pb-2 text-sm font-bold tab-active transition">
+                            <span>✨</span> Narrative Architect
+                        </button>
+                        <button onclick="switchAITab('activity')" id="tab-activity" class="pb-2 text-sm font-bold tab-inactive transition">
+                            <span>✨</span> Activity Refiner
+                        </button>
+                    </div>
+
+                    <!-- Narrative Architect (Default) -->
+                    <div id="ai-tool-narrative" class="bg-gradient-to-r from-stone-50 to-olea-50 rounded-lg p-5 border border-olea-100 shadow-sm">
                         <p class="text-xs text-stone-500 mb-3">
-                            Describe the student's primary interest/spike (e.g., "Robotics & Jazz" or "Debate & Biology"). 
-                            The AI will generate a specific strategic angle tailored to <span id="ai-school-name" class="font-bold">this school</span>.
+                            Describe the student's primary interest/spike (e.g., "Robotics & Jazz"). 
+                            The AI will generate a strategic angle tailored to <span id="ai-school-name-1" class="font-bold">this school</span>.
                         </p>
                         <div class="flex flex-col gap-2">
-                            <textarea id="ai-input" rows="2" placeholder="Enter student spike/interests here..." class="w-full text-sm p-3 rounded border border-stone-300 focus:ring-2 focus:ring-olea-500 focus:outline-none resize-none"></textarea>
-                            <button onclick="generateAINarrative()" id="ai-btn" class="self-end px-4 py-2 bg-gradient-to-r from-olea-600 to-olea-500 text-white text-xs font-bold rounded hover:from-olea-700 hover:to-olea-600 transition shadow-sm flex items-center gap-2">
+                            <textarea id="ai-input-narrative" rows="2" placeholder="Enter student spike/interests here..." class="w-full text-sm p-3 rounded border border-stone-300 focus:ring-2 focus:ring-olea-500 focus:outline-none resize-none"></textarea>
+                            <button onclick="generateAINarrative()" class="self-end px-4 py-2 bg-gradient-to-r from-olea-600 to-olea-500 text-white text-xs font-bold rounded hover:from-olea-700 hover:to-olea-600 transition shadow-sm flex items-center gap-2">
                                 <span>✨</span> Generate Strategy
                             </button>
                         </div>
+                    </div>
+
+                    <!-- Activity Refiner (Hidden) -->
+                    <div id="ai-tool-activity" class="bg-gradient-to-r from-stone-50 to-amber-50 rounded-lg p-5 border border-amber-100 shadow-sm hidden">
+                        <p class="text-xs text-stone-500 mb-3">
+                            Paste a raw activity description (e.g., "President of Debate Club"). 
+                            The AI will rewrite it to mimic <span id="ai-school-name-2" class="font-bold">this school's</span> specific institutional language.
+                        </p>
+                        <div class="flex flex-col gap-2">
+                            <textarea id="ai-input-activity" rows="2" placeholder="Paste raw activity description here..." class="w-full text-sm p-3 rounded border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:outline-none resize-none"></textarea>
+                            <button onclick="generateAIActivity()" class="self-end px-4 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white text-xs font-bold rounded hover:from-amber-700 hover:to-amber-600 transition shadow-sm flex items-center gap-2">
+                                <span>✨</span> Refine Description
+                            </button>
+                        </div>
+                    </div>
                         
-                        <!-- AI Result Area -->
-                        <div id="ai-result-container" class="mt-4 hidden">
-                            <div id="ai-loader" class="flex items-center gap-1 text-olea-600 justify-center py-4 hidden">
-                                <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
-                                <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
-                                <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
-                            </div>
-                            <div id="ai-response" class="text-sm text-stone-800 bg-white p-4 rounded border border-olea-200 leading-relaxed font-serif italic">
-                                <!-- Content goes here -->
-                            </div>
+                    <!-- AI Result Area (Shared) -->
+                    <div id="ai-result-container" class="mt-4 hidden">
+                        <div id="ai-loader" class="flex items-center gap-1 text-olea-600 justify-center py-4 hidden">
+                            <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
+                            <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
+                            <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
+                        </div>
+                        <div id="ai-response" class="text-sm text-stone-800 bg-white p-4 rounded border border-olea-200 leading-relaxed font-serif italic">
+                            <!-- Content goes here -->
                         </div>
                     </div>
                 </div>
@@ -885,9 +930,15 @@
             document.getElementById('modal-strategy').innerText = school.strategy;
             
             // Set AI Text
-            document.getElementById('ai-school-name').innerText = school.name;
-            document.getElementById('ai-input').value = ''; // Clear previous input
-            document.getElementById('ai-result-container').classList.add('hidden'); // Hide previous result
+            document.getElementById('ai-school-name-1').innerText = school.name;
+            document.getElementById('ai-school-name-2').innerText = school.name;
+            document.getElementById('ai-input-narrative').value = ''; 
+            document.getElementById('ai-input-activity').value = ''; 
+            document.getElementById('ai-result-container').classList.add('hidden'); 
+            
+            // Reset Intel
+            document.getElementById('live-intel-result').classList.add('hidden');
+            document.getElementById('live-intel-result').innerHTML = '';
 
             // Evidence List
             const evidenceList = document.getElementById('modal-evidence');
@@ -903,6 +954,9 @@
 
             // Chart
             renderChart(school);
+
+            // Switch to default tab
+            switchAITab('narrative');
 
             document.getElementById('school-modal').classList.remove('hidden');
         }
@@ -1054,11 +1108,16 @@
 
         // --- 5. GEMINI API INTEGRATION ---
 
-        async function callGeminiAPI(promptText) {
+        async function callGeminiAPI(promptText, useSearch = false) {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
             const payload = {
                 contents: [{ parts: [{ text: promptText }] }]
             };
+
+            if (useSearch) {
+                payload.tools = [{ "google_search": {} }];
+            }
 
             // Retry logic
             let retries = 0;
@@ -1081,7 +1140,20 @@
                     }
 
                     const data = await response.json();
-                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+                    
+                    // Extract grounding metadata if present
+                    const grounding = data.candidates?.[0]?.groundingMetadata;
+                    let text = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+                    
+                    if (grounding && grounding.groundingAttributions) {
+                        const sources = grounding.groundingAttributions
+                            .filter(a => a.web && a.web.uri && a.web.title)
+                            .map(a => `<a href="${a.web.uri}" target="_blank" class="text-olea-600 hover:underline">[${a.web.title}]</a>`)
+                            .join(' ');
+                        if(sources) text += `<br><br><small>Sources: ${sources}</small>`;
+                    }
+
+                    return text;
                 } catch (error) {
                     if (retries === maxRetries) {
                         console.error("Max retries reached", error);
@@ -1093,10 +1165,33 @@
             }
         }
 
+        // Tab Logic
+        function switchAITab(tab) {
+            const narrativeTab = document.getElementById('tab-narrative');
+            const activityTab = document.getElementById('tab-activity');
+            const narrativeTool = document.getElementById('ai-tool-narrative');
+            const activityTool = document.getElementById('ai-tool-activity');
+            
+            // Hide result when switching
+            document.getElementById('ai-result-container').classList.add('hidden');
+
+            if(tab === 'narrative') {
+                narrativeTab.classList.replace('tab-inactive', 'tab-active');
+                activityTab.classList.replace('tab-active', 'tab-inactive');
+                narrativeTool.classList.remove('hidden');
+                activityTool.classList.add('hidden');
+            } else {
+                activityTab.classList.replace('tab-inactive', 'tab-active');
+                narrativeTab.classList.replace('tab-active', 'tab-inactive');
+                activityTool.classList.remove('hidden');
+                narrativeTool.classList.add('hidden');
+            }
+        }
+
         // Feature 1: Narrative Architect (Modal)
         async function generateAINarrative() {
             const school = universities.find(u => u.id === currentSchoolIdForAI);
-            const userInterest = document.getElementById('ai-input').value.trim();
+            const userInterest = document.getElementById('ai-input-narrative').value.trim();
             const resultContainer = document.getElementById('ai-result-container');
             const resultText = document.getElementById('ai-response');
             const loader = document.getElementById('ai-loader');
@@ -1126,16 +1221,78 @@
                 - Use HTML formatting (<b> for emphasis, <br> for new lines).
             `;
 
-            const response = await callGeminiAPI(prompt);
-            
-            // Simple markdown-to-html converter (very basic)
+            const response = await callGeminiAPI(prompt, false);
             const formattedResponse = response.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
             
             loader.classList.add('hidden');
             resultText.innerHTML = formattedResponse;
         }
 
-        // Feature 2: Strategic Differentiator (Comparison Tray)
+        // Feature 2: Activity Refiner (Modal)
+        async function generateAIActivity() {
+            const school = universities.find(u => u.id === currentSchoolIdForAI);
+            const userActivity = document.getElementById('ai-input-activity').value.trim();
+            const resultContainer = document.getElementById('ai-result-container');
+            const resultText = document.getElementById('ai-response');
+            const loader = document.getElementById('ai-loader');
+
+            if (!userActivity) {
+                alert("Please enter the activity description first.");
+                return;
+            }
+
+            resultContainer.classList.remove('hidden');
+            resultText.innerHTML = '';
+            loader.classList.remove('hidden');
+
+            const prompt = `
+                Act as a specialized admissions editor.
+                Task: Rewrite the following activity description to sound perfect for ${school.name}'s specific culture and values.
+                
+                Data:
+                - School Persona: ${school.persona} (${school.description})
+                - Raw Activity: "${userActivity}"
+                
+                Output:
+                1. Provide a "Refined Description" (150 chars max) suitable for the Common App.
+                2. Explain *why* this phrasing appeals to this specific school's DNA.
+                
+                Use HTML formatting.
+            `;
+
+            const response = await callGeminiAPI(prompt, false);
+            const formattedResponse = response.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+            
+            loader.classList.add('hidden');
+            resultText.innerHTML = formattedResponse;
+        }
+
+        // Feature 3: Live Intel (Search Grounding)
+        async function fetchLatestIntel() {
+            const school = universities.find(u => u.id === currentSchoolIdForAI);
+            const resultDiv = document.getElementById('live-intel-result');
+            const loader = document.getElementById('intel-loader');
+
+            resultDiv.classList.add('hidden');
+            loader.classList.remove('hidden');
+
+            const prompt = `
+                Find the official supplemental essay prompts for ${school.name} for the 2024-2025 (or latest available) admissions cycle. 
+                Summarize them into a concise bulleted list. 
+                If you find a "Why Us" prompt, highlight it.
+            `;
+
+            const response = await callGeminiAPI(prompt, true); // true = useSearch
+            
+            // Basic formatting
+            const formattedResponse = response.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+
+            loader.classList.add('hidden');
+            resultDiv.classList.remove('hidden');
+            resultDiv.innerHTML = formattedResponse;
+        }
+
+        // Feature 4: Strategic Differentiator (Comparison Tray)
         async function generateComparisonStrategy() {
             const schoolA = comparisonSlots[0];
             const schoolB = comparisonSlots[1];
@@ -1164,8 +1321,7 @@
                 Constraint: Keep it under 150 words. Be direct and tactical. Use HTML formatting.
             `;
 
-            const response = await callGeminiAPI(prompt);
-            
+            const response = await callGeminiAPI(prompt, false);
             const formattedResponse = response.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
 
             loader.classList.add('hidden');
