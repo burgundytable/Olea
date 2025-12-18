@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Olea Education: Institutional DNA Decoder</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        olea: {
+                            50: '#f4f7f4',
+                            100: '#e3ebe3',
+                            200: '#c5d9c5',
+                            300: '#9dbf9d',
+                            400: '#74a074',
+                            500: '#538253', // Primary Olive
+                            600: '#3f663f',
+                            700: '#335233',
+                            800: '#2a422a',
+                            900: '#233623',
+                        },
+                        stone: {
+                            50: '#fafaf9',
+                            100: '#f5f5f4',
+                            800: '#292524',
+                            900: '#1c1917',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
+                        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Chart Container Styles - Mandatory per instructions */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Max width for larger screens */
+            height: 350px;    /* Default height */
+            max-height: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 300px; /* Smaller height on mobile */
+            }
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Custom scrollbar for modals */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* AI Loading Animation */
+        .typing-dot {
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
+    <!-- Chosen Palette: Olea Green (Nature/Growth) + Warm Stone (Academic/Serious) -->
+    <!-- Application Structure Plan: 
+         1. Header: Brand context.
+         2. Filter/Control Bar: Sorting.
+         3. Main Grid: University Cards.
+         4. Modal (The "Decoder"): Includes DNA Radar Chart AND NOW "AI Narrative Architect".
+         5. Comparison Tray: Includes Side-by-Side View AND NOW "AI Strategic Differentiator".
+    -->
+    <!-- Visualization & Content Choices:
+         - Radar Chart (Chart.js): Visualizes the "DNA" instantly.
+         - AI Integration: Uses Gemini to generate "Spike" narratives based on the school's specific persona data.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header Section -->
+    <header class="bg-olea-900 text-white shadow-lg sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-serif font-bold tracking-wide">OLEA EDUCATION</h1>
+                <p class="text-xs text-olea-200 uppercase tracking-widest">Institutional DNA Decoder</p>
+            </div>
+            <div class="hidden md:block">
+                <p class="text-sm italic text-olea-100">"Cultivating Eunoia through Strategic Insight"</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Intro / Context Section -->
+    <section class="bg-white border-b border-stone-200 py-8">
+        <div class="container mx-auto px-4 max-w-4xl text-center">
+            <h2 class="text-3xl font-serif text-olea-900 mb-4">The Scientific Reduction</h2>
+            <p class="text-lg text-stone-600 leading-relaxed mb-6">
+                We have stripped away the marketing veneer of the Top 30 US Universities to reveal their distinct 
+                <strong>Institutional Personas</strong>. Use the AI-powered tools to calibrate your student's narrative 
+                to the specific "Spike" required for each institution.
+            </p>
+            
+            <!-- Filters -->
+            <div class="flex flex-wrap justify-center gap-2 mt-6" id="filter-container">
+                <button onclick="filterSchools('All')" class="px-4 py-2 rounded-full text-sm font-semibold bg-olea-800 text-white transition hover:bg-olea-700 ring-2 ring-olea-800 ring-offset-2">All</button>
+                <button onclick="filterSchools('Intellectual')" class="px-4 py-2 rounded-full text-sm font-semibold bg-stone-200 text-stone-700 transition hover:bg-olea-200 hover:text-olea-900">The Theorists</button>
+                <button onclick="filterSchools('Leadership')" class="px-4 py-2 rounded-full text-sm font-semibold bg-stone-200 text-stone-700 transition hover:bg-olea-200 hover:text-olea-900">The Leaders</button>
+                <button onclick="filterSchools('Pre-Professional')" class="px-4 py-2 rounded-full text-sm font-semibold bg-stone-200 text-stone-700 transition hover:bg-olea-200 hover:text-olea-900">The Pragmatists</button>
+                <button onclick="filterSchools('Civic')" class="px-4 py-2 rounded-full text-sm font-semibold bg-stone-200 text-stone-700 transition hover:bg-olea-200 hover:text-olea-900">The Citizens</button>
+                <button onclick="filterSchools('Innovation')" class="px-4 py-2 rounded-full text-sm font-semibold bg-stone-200 text-stone-700 transition hover:bg-olea-200 hover:text-olea-900">The Makers</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        
+        <!-- School Grid -->
+        <div id="school-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Cards will be injected here via JS -->
+        </div>
+
+    </main>
+
+    <!-- Modal for Deep Dive -->
+    <div id="school-modal" class="fixed inset-0 bg-stone-900 bg-opacity-75 hidden flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col md:flex-row">
+            
+            <!-- Modal Sidebar (Visuals) -->
+            <div class="w-full md:w-1/3 bg-stone-50 p-6 border-r border-stone-200 overflow-y-auto custom-scrollbar">
+                <h3 id="modal-title" class="text-2xl font-serif font-bold text-olea-900 mb-2">School Name</h3>
+                <span id="modal-rank" class="inline-block px-2 py-1 bg-olea-100 text-olea-800 text-xs font-bold rounded mb-4">Rank #1</span>
+                
+                <div class="mb-6">
+                    <h4 class="text-sm uppercase tracking-wide text-stone-500 font-bold mb-2">DNA Profile</h4>
+                    <!-- Chart Container -->
+                    <div class="chart-container">
+                        <canvas id="dnaChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button id="compare-btn" class="w-full py-2 bg-stone-800 text-white rounded hover:bg-stone-700 transition text-sm">
+                        <i class="fas fa-plus mr-2"></i> Add to Comparison
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Content (Text Analysis + AI Tool) -->
+            <div class="w-full md:w-2/3 p-8 overflow-y-auto custom-scrollbar flex flex-col h-full">
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-stone-400 hover:text-stone-800">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+
+                <div class="mb-6">
+                    <h4 class="text-xs font-bold text-olea-600 uppercase tracking-widest mb-1">Reductionist Persona</h4>
+                    <p id="modal-persona" class="text-2xl font-serif text-stone-800 italic leading-snug">
+                        "The Description Goes Here."
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+                    <div>
+                        <h4 class="text-sm font-bold text-stone-900 border-b-2 border-olea-200 pb-2 mb-3">Decode the DNA</h4>
+                        <p id="modal-dna-desc" class="text-stone-600 text-sm leading-relaxed mb-4">
+                            Analysis of why this persona fits.
+                        </p>
+                        <div class="bg-olea-50 p-4 rounded-md border border-olea-100">
+                            <h5 class="text-xs font-bold text-olea-800 uppercase mb-2"><i class="fas fa-microscope mr-1"></i> Evidence Markers</h5>
+                            <ul id="modal-evidence" class="text-xs text-stone-700 space-y-2 list-disc pl-4">
+                                <li>Essay prompt analysis</li>
+                                <li>Strategic plan quote</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-sm font-bold text-stone-900 border-b-2 border-olea-200 pb-2 mb-3">Application Strategy</h4>
+                        <p class="text-xs text-stone-500 italic mb-2">"Admissions Officer Perspective"</p>
+                        <p id="modal-strategy" class="text-stone-700 text-sm leading-relaxed font-medium">
+                            Strategic advice on how to frame the narrative.
+                        </p>
+                        
+                        <div class="mt-6">
+                            <h5 class="text-xs font-bold text-stone-900 uppercase mb-2">Keyword Resonance</h5>
+                            <div id="modal-keywords" class="flex flex-wrap gap-2">
+                                <!-- Keywords injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Section -->
+                <div class="mt-auto pt-6 border-t-2 border-stone-100">
+                    <div class="bg-gradient-to-r from-stone-50 to-olea-50 rounded-lg p-5 border border-olea-100 shadow-sm">
+                        <h4 class="text-sm font-bold text-olea-900 flex items-center gap-2 mb-2">
+                            <span>✨</span> The Narrative Architect
+                        </h4>
+                        <p class="text-xs text-stone-500 mb-3">
+                            Describe the student's primary interest/spike (e.g., "Robotics & Jazz" or "Debate & Biology"). 
+                            The AI will generate a specific strategic angle tailored to <span id="ai-school-name" class="font-bold">this school</span>.
+                        </p>
+                        <div class="flex flex-col gap-2">
+                            <textarea id="ai-input" rows="2" placeholder="Enter student spike/interests here..." class="w-full text-sm p-3 rounded border border-stone-300 focus:ring-2 focus:ring-olea-500 focus:outline-none resize-none"></textarea>
+                            <button onclick="generateAINarrative()" id="ai-btn" class="self-end px-4 py-2 bg-gradient-to-r from-olea-600 to-olea-500 text-white text-xs font-bold rounded hover:from-olea-700 hover:to-olea-600 transition shadow-sm flex items-center gap-2">
+                                <span>✨</span> Generate Strategy
+                            </button>
+                        </div>
+                        
+                        <!-- AI Result Area -->
+                        <div id="ai-result-container" class="mt-4 hidden">
+                            <div id="ai-loader" class="flex items-center gap-1 text-olea-600 justify-center py-4 hidden">
+                                <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
+                                <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
+                                <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
+                            </div>
+                            <div id="ai-response" class="text-sm text-stone-800 bg-white p-4 rounded border border-olea-200 leading-relaxed font-serif italic">
+                                <!-- Content goes here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparison Tray -->
+    <div id="comparison-tray" class="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-olea-600 shadow-xl transform translate-y-full transition-transform duration-300 z-40 flex flex-col h-[320px]">
+        <div class="container mx-auto px-4 py-3 flex-grow flex flex-col">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="text-lg font-serif font-bold text-olea-900 flex items-center gap-2">
+                    Strategic Comparison
+                    <span id="compare-count" class="text-xs bg-olea-100 text-olea-800 px-2 py-0.5 rounded-full">0/2</span>
+                </h3>
+                <button onclick="toggleComparison()" class="text-stone-500 hover:text-stone-800 p-2">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            
+            <div class="flex-grow flex gap-4 overflow-hidden relative">
+                <!-- Slot 1 -->
+                <div id="slot-1" class="flex-1 bg-stone-50 p-4 rounded border border-stone-200 overflow-y-auto custom-scrollbar">
+                    <p class="text-center text-stone-400 italic mt-10">Select a school to compare</p>
+                </div>
+                
+                <!-- Center Action (AI) -->
+                <div class="w-12 flex flex-col justify-center items-center z-10">
+                    <div class="h-full w-[1px] bg-stone-200 absolute left-1/2 transform -translate-x-1/2"></div>
+                    <button onclick="generateComparisonStrategy()" id="compare-ai-btn" class="relative z-20 w-10 h-10 rounded-full bg-white border-2 border-olea-500 text-olea-600 shadow-md hover:bg-olea-50 flex items-center justify-center transition disabled:opacity-50 disabled:cursor-not-allowed" disabled title="Select 2 schools to generate strategy">
+                        <span>✨</span>
+                    </button>
+                </div>
+
+                <!-- Slot 2 -->
+                <div id="slot-2" class="flex-1 bg-stone-50 p-4 rounded border border-stone-200 overflow-y-auto custom-scrollbar">
+                    <p class="text-center text-stone-400 italic mt-10">Select a second school</p>
+                </div>
+            </div>
+            
+            <div class="mt-2 text-center flex justify-between items-center text-xs">
+                <span class="text-stone-400">Click ✨ to synthesize a differentiation strategy.</span>
+                <button onclick="clearComparison()" class="text-red-500 hover:underline">Clear Selection</button>
+            </div>
+        </div>
+
+        <!-- AI Overlay for Comparison Result -->
+        <div id="comparison-ai-result" class="absolute inset-0 bg-white/95 backdrop-blur z-50 p-6 flex flex-col hidden">
+            <div class="flex justify-between items-center mb-4 border-b border-stone-200 pb-2">
+                <h4 class="font-bold text-olea-900">✨ Strategic Differentiator</h4>
+                <button onclick="closeComparisonAI()" class="text-stone-400 hover:text-stone-800">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="comparison-loader" class="flex items-center gap-1 text-olea-600 justify-center py-10 hidden">
+                <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
+                <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
+                <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
+            </div>
+            <div id="comparison-text" class="flex-grow overflow-y-auto custom-scrollbar text-sm text-stone-800 font-serif leading-relaxed px-4">
+                <!-- AI Content -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. DATA: The Scientific Reduction of Top 30 Universities ---
+        const universities = [
+            {
+                id: "princeton",
+                name: "Princeton University",
+                rank: 1,
+                category: "Intellectual",
+                persona: "The Curricular Ascetic",
+                description: "An institution that demands a monastic dedication to the undergraduate mind, culminating in the solitary rigor of the Senior Thesis. It values deep, theoretical inquiry over practical application in the early years.",
+                strategy: "Your narrative must climax in the desire to produce original knowledge. Frame your activities not as 'doing' but as 'preparing to inquire.' Mention specific professors and the Senior Thesis.",
+                evidence: [
+                    "The Senior Thesis is mandatory for all AB students.",
+                    "Unofficial Motto: 'In the Nation's Service and the Service of Humanity.'",
+                    "Focus: Undergraduate teaching is paramount; no med/law/business schools to distract."
+                ],
+                scores: [10, 7, 4, 8, 5], 
+                keywords: ["Senior Thesis", "Service", "Undergraduate Focus", "Theory"]
+            },
+            {
+                id: "mit",
+                name: "MIT",
+                rank: 2,
+                category: "Innovation",
+                persona: "The Collaborative Hacker",
+                description: "A meritocracy of makers where 'Mens et Manus' (Mind and Hand) rules. They reject the solitary genius myth in favor of radical, often playful, collaboration to solve hard problems.",
+                strategy: "Show, don't tell. Focus on how you *built* something or *collaborated* on a failure. Use the 'Maker Portfolio.' Avoid polished, generic leadership rhetoric; be geeks together.",
+                evidence: [
+                    "Motto: Mens et Manus.",
+                    "Culture: 'Hacks' (pranks) require immense engineering and teamwork.",
+                    "Admissions: Very open to 'spiky' candidates with lopsided stats if the passion is real."
+                ],
+                scores: [10, 6, 8, 6, 10],
+                keywords: ["Mens et Manus", "Collaboration", "Making", "Resilience"]
+            },
+            {
+                id: "harvard",
+                name: "Harvard University",
+                rank: 3,
+                category: "Leadership",
+                persona: "The Maximum-Impact Leader",
+                description: "The training ground for the ruling class. They seek students who don't just participate but dominate and transform their environments. It is about scale of impact and raw capacity for power.",
+                strategy: "Demonstrate 'Capacity for Leadership.' Not just holding titles, but changing the trajectory of an organization. Your essay needs a 'Founding Father' tone—authoritative and visionary.",
+                evidence: [
+                    "Mission: To educate the 'citizens and citizen-leaders' for our society.",
+                    "DNA: Extracurriculars are often more intense than classes.",
+                    "Value: High preference for students who have already achieved national/global recognition."
+                ],
+                scores: [9, 10, 8, 8, 7],
+                keywords: ["Leadership", "Impact", "Legacy", "Citizen-Leader"]
+            },
+            {
+                id: "stanford",
+                name: "Stanford University",
+                rank: 3,
+                category: "Innovation",
+                persona: "The Nonlinear Disruptor",
+                description: "The incubator of Silicon Valley optimism. They value 'Intellectual Vitality' combined with a fuss-free, casual excellence. They want students who will break systems to improve them.",
+                strategy: "Highlight 'Intellectual Vitality'—learning for the sake of it, outside class. Frame your achievements as effortless consequences of your curiosity. Avoid 'stuffy' east coast formality.",
+                evidence: [
+                    "Essay Prompt: 'What matters to you, and why?' (Demands raw authenticity).",
+                    "Essay Prompt: 'Intellectual Vitality' (Explicitly asked).",
+                    "Culture: Duck Syndrome (Calm on surface, paddling furiously underneath)."
+                ],
+                scores: [9, 8, 7, 6, 10],
+                keywords: ["Intellectual Vitality", "Innovation", "Disruption", "Authenticity"]
+            },
+            {
+                id: "yale",
+                name: "Yale University",
+                rank: 5,
+                category: "Civic",
+                persona: "The Cosmopolitan Humanist",
+                description: "A training ground for soft power and global citizenship. Unlike Harvard's hard power, Yale values the 'Company of Scholars/Friends' and broad, interdisciplinary humanism within the residential college system.",
+                strategy: "Showcase 'And'—you are a biologist AND a poet. Emphasize community contribution and global perspective. The tone should be warm, reflective, and deeply literate.",
+                evidence: [
+                    "Structure: Residential College system is central to identity.",
+                    "Global Strategy: 'Yale and the World' initiative.",
+                    "Vibe: The 'artsy' Ivy vs. Harvard's 'corporate' Ivy."
+                ],
+                scores: [9, 8, 5, 9, 6],
+                keywords: ["Residential Colleges", "Global Citizen", "Humanism", "Community"]
+            },
+            {
+                id: "uchicago",
+                name: "UChicago",
+                rank: 6,
+                category: "Intellectual",
+                persona: "The Fearless Theorist",
+                description: "The fortress of 'The Life of the Mind.' They pride themselves on being quirky, intensely theoretical, and unafraid of debate. They want students who care more about ideas than careers.",
+                strategy: "Lean into the 'Weird' essays. Take a risk. Demonstrate that you enjoy argument and theory. Do not mention 'getting a job'—talk about the Core Curriculum and the pursuit of truth.",
+                evidence: [
+                    "Marketing: 'Where fun comes to die' (embraced ironically).",
+                    "Essay Prompts: Famous for bizarre prompts (e.g., 'Where is Waldo?').",
+                    "Academics: The Core is sacred and heavy."
+                ],
+                scores: [10, 4, 3, 5, 6],
+                keywords: ["Life of the Mind", "Core Curriculum", "Theory", "Debate"]
+            },
+            {
+                id: "jhu",
+                name: "Johns Hopkins",
+                rank: 7,
+                category: "Pre-Professional",
+                persona: "The Applied Specialist",
+                description: "America's first research university. They value students who want to get their hands dirty with data and primary sources immediately. It is intense, focused, and collaborative in a lab setting.",
+                strategy: "Focus on research capability. Even for humanities, frame your interest as 'investigation.' Move beyond 'I want to help people' to 'I want to solve X pathology using Y methodology.'",
+                evidence: [
+                    "Identity: The Research University.",
+                    "Essay: 'Collaborate with people different from you.'",
+                    "Shift: Moving away from just 'Pre-Med' to 'Interdisciplinary Inquiry'."
+                ],
+                scores: [9, 5, 9, 6, 8],
+                keywords: ["Research", "Investigation", "Global Health", "Data"]
+            },
+            {
+                id: "upenn",
+                name: "UPenn",
+                rank: 7,
+                category: "Pre-Professional",
+                persona: "The Civic Pragmatist",
+                description: "Founded by Ben Franklin, the most practical founder. Penn asks: 'What is this knowledge FOR?' They want interdisciplinary students who will translate theory into real-world practice immediately.",
+                strategy: "Connect every academic interest to a practical application or career outcome. Use the phrase 'Interdisciplinary' correctly (e.g., Wharton + CAS). Show civic engagement in the city of Philadelphia.",
+                evidence: [
+                    "Motto: 'Laws without morals are useless' (Action oriented).",
+                    "Structure: Four undergraduate schools (Nursing, Wharton, Engineering, College).",
+                    "Essay: 'Thank you note' (Focus on relationships and community)."
+                ],
+                scores: [8, 8, 10, 9, 7],
+                keywords: ["Practicality", "Interdisciplinary", "Impact", "Philadelphia"]
+            },
+            {
+                id: "caltech",
+                name: "Caltech",
+                rank: 9,
+                category: "Intellectual",
+                persona: "The Scientific Absolutist",
+                description: "A tiny monastery for science. They care about two things: Honor Code and Math/Science ability. They have zero tolerance for fluff. It is arguably the most rigorous STEM curriculum in the US.",
+                strategy: "Your STEM stats must be perfect. In essays, geek out completely. Don't talk about 'leadership' broadly; talk about the elegance of a proof. Mention the Honor Code.",
+                evidence: [
+                    "Admissions: Faculty often review applications.",
+                    "Size: Extremely small (~900 undergrads).",
+                    "Culture: The Honor Code allows take-home finals."
+                ],
+                scores: [10, 2, 6, 4, 9],
+                keywords: ["Honor Code", "Rigor", "Pure Science", "Small"]
+            },
+            {
+                id: "duke",
+                name: "Duke University",
+                rank: 10,
+                category: "Leadership",
+                persona: "The Ambitious Catalyst",
+                description: "The ultimate 'Work Hard, Play Hard' environment. Duke seeks high-energy, spirited all-rounders who can balance intense academics (Bass Connections) with intense social investment (Sports/Greek life).",
+                strategy: "Show energy. You need to be smart, but also social and spirited. Highlight interdisciplinary problem solving ('Bass Connections') and a desire to be active in the community.",
+                evidence: [
+                    "Program: 'Bass Connections' (Interdisciplinary teams).",
+                    "Vibe: Cameron Crazies (School spirit is non-negotiable).",
+                    "Prompt: 'Why Duke?' usually asks about community."
+                ],
+                scores: [8, 9, 8, 7, 7],
+                keywords: ["Spirit", "Interdisciplinary", "Energy", "Bass Connections"]
+            },
+            {
+                id: "northwestern",
+                name: "Northwestern",
+                rank: 10,
+                category: "Pre-Professional",
+                persona: "The Synergistic Communicator",
+                description: "Where the Midwest work ethic meets elite communication. 'AND is in our DNA.' They love students who combine disparate fields (e.g., Journalism + Engineering) and can communicate complex ideas clearly.",
+                strategy: "Use the word 'AND'. Show how you bridge left-brain (STEM) and right-brain (Arts). Emphasize pragmatic innovation and the Quarter System which allows for double/triple majors.",
+                evidence: [
+                    "Motto: 'AND is in our DNA.'",
+                    "Schedule: The Quarter System (Fast paced, allows more classes).",
+                    "Strengths: Medill (Journalism) and Engineering are top tier."
+                ],
+                scores: [8, 7, 9, 6, 8],
+                keywords: ["AND", "Communication", "Quarter System", "Synergy"]
+            },
+            {
+                id: "dartmouth",
+                name: "Dartmouth",
+                rank: 12,
+                category: "Civic",
+                persona: "The Intrepid Adventurer",
+                description: "An Ivy in the woods. They value 'Place-based learning,' distinct flexibility (D-Plan), and a fiercely loyal, tight-knit undergraduate community. They want distinct individuals who love the outdoors/nature.",
+                strategy: "Reference the specific location (Hanover) as an asset, not a liability. Explain how you will use the 'D-Plan' (Quarter system) to take internships in off-seasons. Be 'nice' and collaborative.",
+                evidence: [
+                    "System: The D-Plan (Year-round calendar).",
+                    "Essay: 'Introduce yourself' (Playful, personal).",
+                    "Vibe: Basecamp to the world."
+                ],
+                scores: [8, 7, 6, 9, 5],
+                keywords: ["D-Plan", "Community", "Nature", "Flexibility"]
+            },
+            {
+                id: "brown",
+                name: "Brown University",
+                rank: 13,
+                category: "Intellectual",
+                persona: "The Intellectual Libertarian",
+                description: "The architect of their own education. With the 'Open Curriculum' (no core requirements), Brown demands students who are self-directed, creative, and willing to take risks without grade anxiety.",
+                strategy: "You must prove you can handle total freedom. Don't say you 'want a broad education'—say exactly which disparate fields you will combine. Mention S/NC (Satisfactory/No Credit) as a way to take risks.",
+                evidence: [
+                    "Curriculum: The Open Curriculum (No Core).",
+                    "Grades: Options for written evals/Pass-Fail.",
+                    "Essay: 'The Open Curriculum' prompt is the most important."
+                ],
+                scores: [9, 6, 3, 9, 8],
+                keywords: ["Open Curriculum", "Self-Directed", "Risk", "Creative"]
+            },
+            {
+                id: "vanderbilt",
+                name: "Vanderbilt",
+                rank: 13,
+                category: "Civic",
+                persona: "The Socially Harmonious Scholar",
+                description: "A Southern Ivy that prides itself on 'Balance.' Students are elite scholars but also rated the 'Happiest' with high quality of life. They value collaboration, kindness, and community engagement.",
+                strategy: "Highlight 'Balance.' You are competitive but kind. Discuss 'The Commons' (First-year living experience). Avoid looking too cutthroat; emphasize social intelligence.",
+                evidence: [
+                    "Rating: Consistently ranked 'Happiest Students'.",
+                    "Housing: The Commons (living-learning communities).",
+                    "Location: Nashville (Music City) integration."
+                ],
+                scores: [8, 8, 7, 10, 5],
+                keywords: ["Balance", "Happiness", "Community", "Nashville"]
+            },
+            {
+                id: "rice",
+                name: "Rice University",
+                rank: 15,
+                category: "Innovation",
+                persona: "The Unconventional Innovator",
+                description: "A small powerhouse in Texas. They combine the residential college intimacy of Yale with the space-age research of Houston. They value 'Unconventional Wisdom' and quality of life.",
+                strategy: "Focus on the 'Culture of Care.' Mention the Residential Colleges (random assignment, strong loyalty). Highlight research opportunities next door at the Texas Medical Center.",
+                evidence: [
+                    "Motto: Unconventional Wisdom.",
+                    "Culture: 'Culture of Care' (Students help each other).",
+                    "Proximity: Texas Medical Center and NASA."
+                ],
+                scores: [9, 6, 7, 9, 8],
+                keywords: ["Culture of Care", "Unconventional", "Research", "Residential Colleges"]
+            },
+            {
+                id: "washu",
+                name: "WashU St. Louis",
+                rank: 15,
+                category: "Civic",
+                persona: "The Collaborative Achiever",
+                description: "Friendly, wealthy, and intensely pre-professional (especially Pre-Med/Biz). They pride themselves on knowing every student 'by name and story.' It is elite access with a smile.",
+                strategy: "Be nice. Be incredibly high achieving, but emphasize your friendly nature. Mention specific interdisciplinary programs. Great for Pre-Med students who want support, not sabotage.",
+                evidence: [
+                    "Admissions: Focus on 'Knowing every student by name and story.'",
+                    "Campus: High quality of life (dorms/food).",
+                    "Strength: Olin Business and Pre-Med tracks."
+                ],
+                scores: [8, 7, 9, 9, 6],
+                keywords: ["Community", "Support", "Pre-Med", "St. Louis"]
+            },
+            {
+                id: "cornell",
+                name: "Cornell University",
+                rank: 17,
+                category: "Pre-Professional",
+                persona: "The Vocational Egalitarian",
+                description: "The 'Any Person, Any Study' school. It is the most diverse Ivy in terms of academic offerings (Hotel, Agriculture, Labor Relations). It is intense, cold, and massive.",
+                strategy: "Fit to Major is CRITICAL. You apply to a specific college (e.g., Dyson, ILR, CALS). Your essay must be purely about why THAT college fits your specific vocational/academic goals.",
+                evidence: [
+                    "Motto: '...instruction in any study.'",
+                    "Structure: Distinct colleges with distinct admissions.",
+                    "Vibe: 'The easiest Ivy to get into, the hardest to stay in.'"
+                ],
+                scores: [8, 6, 10, 6, 7],
+                keywords: ["Any Study", "Fit to Major", "Vocational", "Grit"]
+            },
+            {
+                id: "columbia",
+                name: "Columbia University",
+                rank: 18,
+                category: "Intellectual",
+                persona: "The Dialectical Urbanist",
+                description: "The intellectual boot camp in NYC. The 'Core Curriculum' forces all students to read the Western Canon. They want students who can handle the city and the heavy reading load.",
+                strategy: "Read the books. If you don't want to discuss Plato/Homer, don't apply. Sell your ability to engage with the City as a classroom. It is for mature, independent intellectuals.",
+                evidence: [
+                    "Curriculum: The Core (Lit Hum, Contemp Civ) is non-negotiable.",
+                    "Location: NYC is central to the pitch.",
+                    "Tone: Intellectual arrogance is slightly more tolerated here."
+                ],
+                scores: [10, 6, 8, 4, 5],
+                keywords: ["The Core", "NYC", "Canon", "Debate"]
+            },
+            {
+                id: "notredame",
+                name: "Notre Dame",
+                rank: 18,
+                category: "Civic",
+                persona: "The Moral Crusader",
+                description: "A premier Catholic research university that demands you be a force for good. Academics are elite, but the 'Soul' matters more. They want leaders who serve.",
+                strategy: "You don't need to be Catholic, but you must respect faith and service. Frame your ambitions through the lens of moral responsibility and community building.",
+                evidence: [
+                    "Mission: 'A force for good in the world.'",
+                    "Structure: Dorm life is central (no sororities/fraternities, dorms replace them).",
+                    "Focus: Ethics in every major (e.g., Mendoza College of Business ethics)."
+                ],
+                scores: [7, 8, 6, 10, 4],
+                keywords: ["Force for Good", "Service", "Ethics", "Tradition"]
+            },
+            {
+                id: "berkeley",
+                name: "UC Berkeley",
+                rank: 20,
+                category: "Innovation",
+                persona: "The Radical Scaler",
+                description: "The top public university. It is massive, bureaucratic, and politically charged. It wants students who are independent agents of change and can navigate a city-sized institution to find resources.",
+                strategy: "Demonstrate 'Grit' and 'Scale.' You navigated barriers. You led a movement. Do not expect hand-holding. Focus on public mission and social mobility.",
+                evidence: [
+                    "History: Free Speech Movement.",
+                    "Scale: Huge classes, self-advocacy required.",
+                    "Research: Top tier in almost every grad field."
+                ],
+                scores: [9, 8, 7, 9, 9],
+                keywords: ["Public Mission", "Activism", "Scale", "Research"]
+            },
+            {
+                id: "ucla",
+                name: "UCLA",
+                rank: 20,
+                category: "Leadership",
+                persona: "The Optimistic Futurist",
+                description: "The most applied-to school in the nation. It blends elite academics with LA's creative economy and optimism. They want high-achieving leaders who are ready to shape culture.",
+                strategy: "Be a 'Changemaker.' Focus on community impact and leadership. It is less politically radical than Berkeley, more polished and optimistic. Highlight creativity.",
+                evidence: [
+                    "Stat: Most applicants in the US.",
+                    "Location: Los Angeles (Arts/Culture/Tech).",
+                    "Vibe: Optimistic, sunny, high-achieving."
+                ],
+                scores: [8, 9, 8, 8, 8],
+                keywords: ["Optimism", "Impact", "Los Angeles", "Culture"]
+            },
+            {
+                id: "cmu",
+                name: "Carnegie Mellon",
+                rank: 22,
+                category: "Innovation",
+                persona: "The Interdisciplinary Specialist",
+                description: "Where Art meets Tech. Known for CS and Drama. They want students who are obsessively good at one thing but willing to collaborate across fields. 'My Heart is in the Work.'",
+                strategy: "Show passion for the WORK. Not the prestige, the actual doing. If you are STEM, show your artsy side. If you are Arts, show your tech side. Be a 'nerd' about your craft.",
+                evidence: [
+                    "Motto: 'My heart is in the work.'",
+                    "Strength: #1 in CS, Top in Drama/Arts.",
+                    "Culture: Intense, focused, interdisciplinary."
+                ],
+                scores: [9, 5, 9, 4, 10],
+                keywords: ["Work", "Interdisciplinary", "CS+X", "Passion"]
+            },
+            {
+                id: "emory",
+                name: "Emory University",
+                rank: 22,
+                category: "Civic",
+                persona: "The Compassionate Intellectual",
+                description: "The 'Wise Heart.' Located in Atlanta (CDC HQ), it is a hub for public health, liberal arts, and ethics. They value students who use intellect to solve human problems.",
+                strategy: "Focus on 'Health' in the broad sense (social, physical, political). Mention the Atlanta location and the 'Liberal Arts' foundation even for pre-meds.",
+                evidence: [
+                    "Motto: 'The wise heart seeks knowledge.'",
+                    "Location: Next to CDC (Public Health focus).",
+                    "Campuses: Oxford College option (Intimate start)."
+                ],
+                scores: [8, 6, 8, 9, 6],
+                keywords: ["Wise Heart", "Public Health", "Atlanta", "Ethics"]
+            },
+            {
+                id: "georgetown",
+                name: "Georgetown",
+                rank: 22,
+                category: "Leadership",
+                persona: "The Diplomatic Servant",
+                description: "The Jesuit school in DC. 'Cura Personalis' (Care for the whole person) is the rule. They educate the global diplomatic corps. They want students who are politically aware and values-driven.",
+                strategy: "You MUST address 'Cura Personalis.' Show you care about the world/politics. Even for business (McDonough), frame it as 'serving the common good.'",
+                evidence: [
+                    "Value: Cura Personalis (Jesuit value).",
+                    "School: SFS (School of Foreign Service) is legendary.",
+                    "Prompt: 'Educating the whole person.'"
+                ],
+                scores: [9, 9, 8, 10, 5],
+                keywords: ["Cura Personalis", "Service", "DC", "Global"]
+            },
+            {
+                id: "nyu",
+                name: "NYU",
+                rank: 25,
+                category: "Innovation",
+                persona: "The Autonomous Cosmopolitan",
+                description: "The school without walls. 'In and of the City.' It requires a student who is independent, fast-paced, and doesn't need a traditional campus to survive. Global Network University.",
+                strategy: "Do not ask for a 'campus community.' Ask for the WORLD. Show you are ready to hustle in NYC. Mention the Global sites (Abu Dhabi, Shanghai).",
+                evidence: [
+                    "Motto: 'In and of the City, In and of the World.'",
+                    "Structure: No enclosed campus; the city is the campus.",
+                    "Global: Massive study abroad network."
+                ],
+                scores: [8, 6, 9, 7, 8],
+                keywords: ["City", "Global", "Independent", "Hustle"]
+            },
+            {
+                id: "usc",
+                name: "USC",
+                rank: 25,
+                category: "Pre-Professional",
+                persona: "The Connected Polymath",
+                description: "The Trojan Family. A massive private research uni with elite cinema/comm/business schools. They value the 'Renaissance Scholar' (Major/Minor in disparate fields) and deep networking.",
+                strategy: "Mention the 'Trojan Family' network. Aim for the 'Renaissance Scholar' distinction (e.g., Engineering + Film). Show you can leverage connections and hustle.",
+                evidence: [
+                    "Network: The Trojan Family is real and powerful.",
+                    "Program: Renaissance Scholars (combining widely different fields).",
+                    "Vibe: LA, pre-professional, spirited."
+                ],
+                scores: [8, 9, 10, 7, 8],
+                keywords: ["Trojan Family", "Renaissance", "Interdisciplinary", "Network"]
+            },
+            {
+                id: "uva",
+                name: "UVA",
+                rank: 25,
+                category: "Leadership",
+                persona: "The Honor-Bound Citizen",
+                description: "Mr. Jefferson's University. Student Self-Governance is the core religion. Students run everything. They want leaders who are ethical, honorable, and ready to govern themselves.",
+                strategy: "Discuss 'Student Self-Governance.' Mention the Honor System (Lying, Cheating, Stealing = expulsion). It is about high-minded citizenship and tradition.",
+                evidence: [
+                    "Founder: Thomas Jefferson (The Academical Village).",
+                    "System: Student Self-Governance (students run judiciary/honor).",
+                    "Vibe: Traditional, social, leader-heavy."
+                ],
+                scores: [8, 9, 6, 10, 5],
+                keywords: ["Self-Governance", "Honor", "Jefferson", "Tradition"]
+            },
+            {
+                id: "unc",
+                name: "UNC Chapel Hill",
+                rank: 28,
+                category: "Civic",
+                persona: "The Public Steward",
+                description: "The first public university. 'The Carolina Way.' Deeply committed to the state of NC and low-income access. They want students who are kind, collaborative, and serve the public good.",
+                strategy: "Focus on 'The Carolina Way' (Excellence with a heart). If you aren't from NC, you need to show why you value a PUBLIC mission. Be collaborative.",
+                evidence: [
+                    "Motto: Lux Libertas.",
+                    "Vibe: 'The Carolina Way' (Collaborative, humble leadership).",
+                    "Mission: Deep commitment to public service."
+                ],
+                scores: [8, 7, 6, 10, 6],
+                keywords: ["Carolina Way", "Public Good", "Collaboration", "Service"]
+            },
+            {
+                id: "tufts",
+                name: "Tufts University",
+                rank: 29,
+                category: "Civic",
+                persona: "The Intellectual Citizen",
+                description: "The smallest research university / biggest liberal arts college. Known for International Relations and Active Citizenship (Tisch College). Quirky, kind, and globally minded.",
+                strategy: "Highlight 'Active Citizenship.' You are smart but you want to 'Do Good.' Intellectual playfulness is key (the essays are fun). Be humble.",
+                evidence: [
+                    "College: Tisch College of Civic Life (central to identity).",
+                    "Mascot: Jumbo the Elephant.",
+                    "Vibe: Intellectual but not cutthroat."
+                ],
+                scores: [9, 6, 5, 10, 7],
+                keywords: ["Civic Life", "Global", "Playful", "Kindness"]
+            },
+            {
+                id: "umich",
+                name: "Univ. of Michigan",
+                rank: 29,
+                category: "Leadership",
+                persona: "The Gregarious Victor",
+                description: "The 'Leaders and Best.' Massive scale, massive spirit, massive resources. It is the quintessential college experience. They want students with high energy who can scale their impact.",
+                strategy: "Show 'Spirit.' You need to be high energy. Academic excellence is a given, but you need to show you can handle a huge ecosystem. Ross Business and Engineering are huge draws.",
+                evidence: [
+                    "Anthem: 'The Victors' (Leaders and Best).",
+                    "Scale: Huge alumni network.",
+                    "Research: Top public research spend."
+                ],
+                scores: [9, 9, 8, 8, 7],
+                keywords: ["Leaders", "Scale", "Spirit", "Excellence"]
+            }
+        ];
+
+        // --- 2. State & Logic ---
+        let currentFilter = 'All';
+        let comparisonSlots = [null, null];
+        let radarChart = null;
+        let currentSchoolIdForAI = null;
+        const apiKey = ""; // Injected by environment
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderGrid(universities);
+        });
+
+        // Filter Logic
+        function filterSchools(category) {
+            currentFilter = category;
+            
+            // Update button styles
+            const buttons = document.querySelectorAll('#filter-container button');
+            buttons.forEach(btn => {
+                if(btn.innerText.includes(category) || (category === 'All' && btn.innerText === 'All')) {
+                    btn.classList.remove('bg-stone-200', 'text-stone-700');
+                    btn.classList.add('bg-olea-800', 'text-white');
+                } else {
+                    btn.classList.add('bg-stone-200', 'text-stone-700');
+                    btn.classList.remove('bg-olea-800', 'text-white');
+                }
+            });
+
+            // Filter data
+            const filtered = category === 'All' 
+                ? universities 
+                : universities.filter(u => u.category === category);
+            
+            renderGrid(filtered);
+        }
+
+        // Render Cards
+        function renderGrid(data) {
+            const grid = document.getElementById('school-grid');
+            grid.innerHTML = '';
+
+            data.forEach(school => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-sm border border-stone-200 p-6 card-hover cursor-pointer flex flex-col justify-between h-full';
+                card.onclick = () => openModal(school.id);
+                
+                // Determine badge color
+                let badgeColor = 'bg-stone-100 text-stone-600';
+                if(school.category === 'Intellectual') badgeColor = 'bg-purple-100 text-purple-800';
+                if(school.category === 'Leadership') badgeColor = 'bg-blue-100 text-blue-800';
+                if(school.category === 'Civic') badgeColor = 'bg-green-100 text-green-800';
+                if(school.category === 'Innovation') badgeColor = 'bg-amber-100 text-amber-800';
+                if(school.category === 'Pre-Professional') badgeColor = 'bg-red-100 text-red-800';
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-bold text-stone-400">Rank #${school.rank}</span>
+                            <span class="text-[10px] uppercase font-bold px-2 py-1 rounded ${badgeColor}">${school.category}</span>
+                        </div>
+                        <h3 class="text-xl font-serif font-bold text-olea-900 mb-2">${school.name}</h3>
+                        <p class="text-sm text-stone-600 italic mb-4">"${school.persona}"</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-stone-100 flex justify-between items-center text-xs text-olea-600 font-bold uppercase tracking-wide">
+                        <span>Decode DNA</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Modal Logic
+        function openModal(id) {
+            const school = universities.find(u => u.id === id);
+            if(!school) return;
+
+            currentSchoolIdForAI = id; // Set for AI use
+
+            document.getElementById('modal-title').innerText = school.name;
+            document.getElementById('modal-rank').innerText = `US News Rank: #${school.rank}`;
+            document.getElementById('modal-persona').innerText = `"${school.persona}"`;
+            document.getElementById('modal-dna-desc').innerText = school.description;
+            document.getElementById('modal-strategy').innerText = school.strategy;
+            
+            // Set AI Text
+            document.getElementById('ai-school-name').innerText = school.name;
+            document.getElementById('ai-input').value = ''; // Clear previous input
+            document.getElementById('ai-result-container').classList.add('hidden'); // Hide previous result
+
+            // Evidence List
+            const evidenceList = document.getElementById('modal-evidence');
+            evidenceList.innerHTML = school.evidence.map(e => `<li>${e}</li>`).join('');
+
+            // Keywords
+            const kwContainer = document.getElementById('modal-keywords');
+            kwContainer.innerHTML = school.keywords.map(k => `<span class="px-2 py-1 bg-stone-100 text-stone-600 rounded text-[10px] uppercase tracking-wide">${k}</span>`).join('');
+
+            // Compare Button Logic
+            const compareBtn = document.getElementById('compare-btn');
+            compareBtn.onclick = () => addToComparison(school);
+
+            // Chart
+            renderChart(school);
+
+            document.getElementById('school-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('school-modal').classList.add('hidden');
+        }
+
+        // --- 3. Visualization: Chart.js ---
+        function renderChart(school) {
+            const ctx = document.getElementById('dnaChart').getContext('2d');
+            
+            if(radarChart) {
+                radarChart.destroy();
+            }
+
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Intellectual Rigor', 'Leadership', 'Pre-Professional', 'Civic Engagement', 'Innovation'],
+                    datasets: [{
+                        label: school.name,
+                        data: school.scores,
+                        backgroundColor: 'rgba(83, 130, 83, 0.5)', // Olea-500
+                        borderColor: '#538253',
+                        pointBackgroundColor: '#233623',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 10,
+                            ticks: {
+                                display: false // Hide numbers for cleaner look
+                            },
+                            grid: {
+                                color: '#e5e7eb'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 11,
+                                    family: 'sans-serif'
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // --- 4. Comparison Logic ---
+        function toggleComparison() {
+            const tray = document.getElementById('comparison-tray');
+            if(tray.classList.contains('translate-y-full')) {
+                tray.classList.remove('translate-y-full');
+            } else {
+                tray.classList.add('translate-y-full');
+            }
+        }
+
+        function addToComparison(school) {
+            // Check if already in
+            if(comparisonSlots[0]?.id === school.id || comparisonSlots[1]?.id === school.id) {
+                alert("School already in comparison tray.");
+                return;
+            }
+
+            // Fill slots
+            if(!comparisonSlots[0]) {
+                comparisonSlots[0] = school;
+            } else if (!comparisonSlots[1]) {
+                comparisonSlots[1] = school;
+            } else {
+                // Shift: Remove first, add new to second
+                comparisonSlots[0] = comparisonSlots[1];
+                comparisonSlots[1] = school;
+            }
+
+            renderComparisonTray();
+            
+            // Show tray if hidden
+            const tray = document.getElementById('comparison-tray');
+            tray.classList.remove('translate-y-full');
+        }
+
+        function renderComparisonTray() {
+            let count = 0;
+            [0, 1].forEach(index => {
+                const school = comparisonSlots[index];
+                const slotDiv = document.getElementById(`slot-${index + 1}`);
+                
+                if(school) {
+                    count++;
+                    slotDiv.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-serif font-bold text-olea-900">${school.name}</h4>
+                            <button onclick="removeComparison(${index})" class="text-xs text-red-400 hover:text-red-600">Remove</button>
+                        </div>
+                        <p class="text-xs font-bold text-stone-500 uppercase mt-1">${school.persona}</p>
+                        <p class="text-xs text-stone-700 mt-2 line-clamp-3">${school.description}</p>
+                        <div class="mt-2 text-[10px] text-olea-700">
+                             <strong>Spike:</strong> ${school.category}
+                        </div>
+                    `;
+                } else {
+                    slotDiv.innerHTML = `<p class="text-center text-stone-400 italic mt-10">Select a school to compare</p>`;
+                }
+            });
+
+            document.getElementById('compare-count').innerText = `${count}/2`;
+            const compareAiBtn = document.getElementById('compare-ai-btn');
+            if(count === 2) {
+                compareAiBtn.disabled = false;
+                compareAiBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                compareAiBtn.classList.add('animate-pulse'); // Add pulse to draw attention
+            } else {
+                compareAiBtn.disabled = true;
+                compareAiBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                compareAiBtn.classList.remove('animate-pulse');
+            }
+        }
+
+        function removeComparison(index) {
+            comparisonSlots[index] = null;
+            renderComparisonTray();
+            closeComparisonAI(); // Close overlay if removing a school
+        }
+        
+        function clearComparison() {
+            comparisonSlots = [null, null];
+            renderComparisonTray();
+            closeComparisonAI();
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('school-modal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // --- 5. GEMINI API INTEGRATION ---
+
+        async function callGeminiAPI(promptText) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: promptText }] }]
+            };
+
+            // Retry logic
+            let retries = 0;
+            const maxRetries = 5;
+            const delays = [1000, 2000, 4000, 8000, 16000];
+
+            while (retries <= maxRetries) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 429) {
+                            throw new Error("Rate limit exceeded");
+                        }
+                        throw new Error(`API Error: ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+                } catch (error) {
+                    if (retries === maxRetries) {
+                        console.error("Max retries reached", error);
+                        return "Error: Unable to connect to Olea's AI Strategy Consultant. Please try again later.";
+                    }
+                    await new Promise(resolve => setTimeout(resolve, delays[retries]));
+                    retries++;
+                }
+            }
+        }
+
+        // Feature 1: Narrative Architect (Modal)
+        async function generateAINarrative() {
+            const school = universities.find(u => u.id === currentSchoolIdForAI);
+            const userInterest = document.getElementById('ai-input').value.trim();
+            const resultContainer = document.getElementById('ai-result-container');
+            const resultText = document.getElementById('ai-response');
+            const loader = document.getElementById('ai-loader');
+
+            if (!userInterest) {
+                alert("Please enter the student's interests first.");
+                return;
+            }
+
+            resultContainer.classList.remove('hidden');
+            resultText.innerHTML = '';
+            loader.classList.remove('hidden');
+
+            const prompt = `
+                Act as a ruthless Ivy League admissions consultant. 
+                Task: Suggest 2 distinct, high-level narrative 'hooks' or 'spikes' a student could use to appeal specifically to ${school.name}.
+                
+                Context:
+                - School Persona: ${school.persona}
+                - DNA Description: ${school.description}
+                - Student's Raw Interest: "${userInterest}"
+                
+                Instructions:
+                - Do not give generic advice.
+                - Explain exactly how to frame the "${userInterest}" to fit the "${school.persona}" archetype.
+                - Keep it under 150 words.
+                - Use HTML formatting (<b> for emphasis, <br> for new lines).
+            `;
+
+            const response = await callGeminiAPI(prompt);
+            
+            // Simple markdown-to-html converter (very basic)
+            const formattedResponse = response.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+            
+            loader.classList.add('hidden');
+            resultText.innerHTML = formattedResponse;
+        }
+
+        // Feature 2: Strategic Differentiator (Comparison Tray)
+        async function generateComparisonStrategy() {
+            const schoolA = comparisonSlots[0];
+            const schoolB = comparisonSlots[1];
+            const overlay = document.getElementById('comparison-ai-result');
+            const loader = document.getElementById('comparison-loader');
+            const text = document.getElementById('comparison-text');
+
+            if (!schoolA || !schoolB) return;
+
+            overlay.classList.remove('hidden');
+            loader.classList.remove('hidden');
+            text.innerHTML = '';
+
+            const prompt = `
+                Act as a senior admissions strategist.
+                Task: Compare the application strategy for ${schoolA.name} vs. ${schoolB.name}.
+                
+                Data:
+                - School A: ${schoolA.name} (${schoolA.persona}) - "${schoolA.description}"
+                - School B: ${schoolB.name} (${schoolB.persona}) - "${schoolB.description}"
+                
+                Output:
+                1. Identify the core conflict or difference in values between these two schools.
+                2. Explain how the student must shift their tone/narrative when writing essays for School A versus School B.
+                
+                Constraint: Keep it under 150 words. Be direct and tactical. Use HTML formatting.
+            `;
+
+            const response = await callGeminiAPI(prompt);
+            
+            const formattedResponse = response.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+
+            loader.classList.add('hidden');
+            text.innerHTML = formattedResponse;
+        }
+
+        function closeComparisonAI() {
+            document.getElementById('comparison-ai-result').classList.add('hidden');
+        }
+
+    </script>
+</body>
+</html>
