@@ -10,34 +10,35 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Gantari (Body) & Outfit (Heading - Primeform Alternative) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gantari:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
+                        // Brand Kit Colors
                         olea: {
-                            50: '#f4f7f4',
-                            100: '#e3ebe3',
-                            200: '#c5d9c5',
-                            300: '#9dbf9d',
-                            400: '#74a074',
-                            500: '#538253', // Primary Olive
-                            600: '#3f663f',
-                            700: '#335233',
-                            800: '#2a422a',
-                            900: '#233623',
+                            base: '#f9f5ef',    // Background Cream
+                            primary: '#123d07', // Deep Olive Green
+                            secondary: '#2e5c21', // Lighter Green for accents
+                            light: '#e3ebe3',
+                            hover: '#0a2404',
                         },
                         stone: {
-                            50: '#fafaf9',
-                            100: '#f5f5f4',
+                            50: '#f9f5ef', // Mapping brand base to stone-50 logic
+                            100: '#efeae4',
+                            200: '#e5e0d8',
                             800: '#292524',
                             900: '#1c1917',
                         }
                     },
                     fontFamily: {
-                        serif: ['Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
-                        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+                        sans: ['Gantari', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'], // Replaces Primeform
                     }
                 }
             }
@@ -48,117 +49,108 @@
         .chart-container {
             position: relative;
             width: 100%;
-            max-width: 600px; /* Max width for larger screens */
-            height: 350px;    /* Default height */
+            max-width: 600px;
+            height: 350px;
             max-height: 400px;
             margin-left: auto;
             margin-right: auto;
         }
         @media (max-width: 640px) {
             .chart-container {
-                height: 300px; /* Smaller height on mobile */
+                height: 300px;
             }
         }
         
         .card-hover {
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .card-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(18, 61, 7, 0.1), 0 8px 10px -6px rgba(18, 61, 7, 0.1);
+            border-color: #123d07;
         }
-        /* Custom scrollbar for modals */
+
+        /* Custom scrollbar */
         .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: #f9f5ef;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
+            background: #c5d9c5;
+            border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #555;
+            background: #123d07;
         }
 
-        /* AI Loading Animation */
-        .typing-dot {
-            animation: typing 1.4s infinite ease-in-out both;
-        }
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-        
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
+        body {
+            background-color: #f9f5ef; /* Brand Base */
         }
 
-        .tab-active {
-            border-bottom: 2px solid #538253;
-            color: #2a422a;
-            font-weight: bold;
+        /* Quiz Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
         }
-        .tab-inactive {
-            color: #78716c;
-        }
-        .tab-inactive:hover {
-            color: #2a422a;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
-    <!-- Chosen Palette: Olea Green (Nature/Growth) + Warm Stone (Academic/Serious) -->
-    <!-- Application Structure Plan: 
-         1. Header: Brand context.
-         2. Filter/Control Bar: Sorting.
-         3. Main Grid: University Cards.
-         4. Modal (The "Decoder"): Includes DNA Radar Chart AND AI Tools (Narrative Architect, Activity Refiner, Live Intel).
-         5. Comparison Tray: Includes Side-by-Side View AND "AI Strategic Differentiator".
-    -->
-    <!-- Visualization & Content Choices:
-         - Radar Chart (Chart.js): Visualizes the "DNA" instantly.
-         - AI Integration: Uses Gemini to generate "Spike" narratives, refine activities, and fetch live data via Search Grounding.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 </head>
-<body class="bg-stone-50 text-stone-800 font-sans min-h-screen flex flex-col">
+<body class="text-olea-primary font-sans min-h-screen flex flex-col antialiased">
 
     <!-- Header Section -->
-    <header class="bg-olea-900 text-white shadow-lg sticky top-0 z-40">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-serif font-bold tracking-wide">OLEA EDUCATION</h1>
-                <p class="text-xs text-olea-200 uppercase tracking-widest">Institutional DNA Decoder</p>
+    <header class="bg-olea-primary text-olea-base shadow-md sticky top-0 z-40">
+        <div class="container mx-auto px-6 py-5 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <!-- Simple CSS Circle Logo representing the Brand Symbol -->
+                <div class="w-10 h-10 rounded-full border-2 border-olea-base flex items-center justify-center">
+                    <div class="w-3 h-3 rounded-full bg-olea-base"></div>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-display font-bold tracking-tight leading-none">OLEA EDUCATION</h1>
+                    <p class="text-[10px] uppercase tracking-[0.2em] opacity-80 mt-1">Cultivating Eunoia</p>
+                </div>
             </div>
             <div class="hidden md:block">
-                <p class="text-sm italic text-olea-100">"Cultivating Eunoia through Strategic Insight"</p>
+                <p class="text-sm font-light text-olea-light opacity-90">Institutional DNA Decoder</p>
             </div>
         </div>
     </header>
 
     <!-- Intro / Context Section -->
-    <section class="bg-white border-b border-stone-200 py-8">
-        <div class="container mx-auto px-4 max-w-4xl text-center">
-            <h2 class="text-3xl font-serif text-olea-900 mb-4">The Scientific Reduction</h2>
-            <p class="text-lg text-stone-600 leading-relaxed mb-6">
+    <section class="border-b border-olea-primary/10 py-10 bg-white/50">
+        <div class="container mx-auto px-4 max-w-5xl text-center">
+            <h2 class="text-3xl md:text-4xl font-display font-bold text-olea-primary mb-5">The Scientific Reduction</h2>
+            <p class="text-lg text-stone-600 leading-relaxed mb-8 max-w-3xl mx-auto font-light">
                 We have stripped away the marketing veneer of the Top 30 US Universities to reveal their distinct 
-                <strong>Institutional Personas</strong>. Use the AI-powered tools to calibrate your student's narrative 
-                to the specific "Spike" required for each institution.
+                <strong>Institutional Personas</strong>. Use the DNA tools to identify the "Spike" required for your narrative.
             </p>
             
+            <!-- Quiz Launch Button -->
+            <div class="mb-8">
+                <button onclick="startQuiz()" class="px-8 py-3 bg-olea-primary text-olea-base text-lg font-display font-bold rounded-lg shadow-lg hover:bg-olea-hover hover:scale-105 transition transform flex items-center mx-auto gap-2">
+                    <i class="fas fa-compass"></i> Find Your DNA Match
+                </button>
+                <p class="text-xs text-stone-500 mt-2 uppercase tracking-wider">Personality & Values Assessment</p>
+            </div>
+
             <!-- Filters -->
-            <div class="flex flex-wrap justify-center gap-2 mt-6" id="filter-container">
-                <button onclick="filterSchools('All')" class="px-4 py-2 rounded-full text-sm font-semibold bg-olea-800 text-white transition hover:bg-olea-700 ring-2 ring-olea-800 ring-offset-2">All</button>
-                <button onclick="filterSchools('Intellectual')" class="px-4 py-2 rounded-full text-sm font-semibold bg-stone-200 text-stone-700 transition hover:bg-olea-200 hover:text-olea-900">The Theorists</button>
-                <button onclick="filterSchools('Leadership')" class="px-4 py-2 rounded-full text-sm font-semibold bg-stone-200 text-stone-700 transition hover:bg-olea-200 hover:text-olea-900">The Leaders</button>
-                <button onclick="filterSchools('Pre-Professional')" class="px-4 py-2 rounded-full text-sm font-semibold bg-stone-200 text-stone-700 transition hover:bg-olea-200 hover:text-olea-900">The Pragmatists</button>
-                <button onclick="filterSchools('Civic')" class="px-4 py-2 rounded-full text-sm font-semibold bg-stone-200 text-stone-700 transition hover:bg-olea-200 hover:text-olea-900">The Citizens</button>
-                <button onclick="filterSchools('Innovation')" class="px-4 py-2 rounded-full text-sm font-semibold bg-stone-200 text-stone-700 transition hover:bg-olea-200 hover:text-olea-900">The Makers</button>
+            <div class="flex flex-wrap justify-center gap-3 mt-4" id="filter-container">
+                <button onclick="filterSchools('All')" id="btn-all" class="px-5 py-2 rounded-full text-sm font-semibold bg-olea-primary text-olea-base transition shadow-md hover:bg-olea-hover ring-1 ring-olea-primary">All</button>
+                <button onclick="filterSchools('Intellectual')" class="px-5 py-2 rounded-full text-sm font-medium bg-white text-stone-600 border border-stone-200 transition hover:bg-olea-light hover:text-olea-primary hover:border-olea-primary">The Theorists</button>
+                <button onclick="filterSchools('Leadership')" class="px-5 py-2 rounded-full text-sm font-medium bg-white text-stone-600 border border-stone-200 transition hover:bg-olea-light hover:text-olea-primary hover:border-olea-primary">The Leaders</button>
+                <button onclick="filterSchools('Pre-Professional')" class="px-5 py-2 rounded-full text-sm font-medium bg-white text-stone-600 border border-stone-200 transition hover:bg-olea-light hover:text-olea-primary hover:border-olea-primary">The Pragmatists</button>
+                <button onclick="filterSchools('Civic')" class="px-5 py-2 rounded-full text-sm font-medium bg-white text-stone-600 border border-stone-200 transition hover:bg-olea-light hover:text-olea-primary hover:border-olea-primary">The Citizens</button>
+                <button onclick="filterSchools('Innovation')" class="px-5 py-2 rounded-full text-sm font-medium bg-white text-stone-600 border border-stone-200 transition hover:bg-olea-light hover:text-olea-primary hover:border-olea-primary">The Makers</button>
             </div>
         </div>
     </section>
 
     <!-- Main Content Area -->
-    <main class="flex-grow container mx-auto px-4 py-8">
+    <main class="flex-grow container mx-auto px-4 py-10">
         
         <!-- School Grid -->
         <div id="school-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -167,134 +159,120 @@
 
     </main>
 
-    <!-- Modal for Deep Dive -->
-    <div id="school-modal" class="fixed inset-0 bg-stone-900 bg-opacity-75 hidden flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-lg shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col md:flex-row">
-            
-            <!-- Modal Sidebar (Visuals) -->
-            <div class="w-full md:w-1/3 bg-stone-50 p-6 border-r border-stone-200 overflow-y-auto custom-scrollbar">
-                <h3 id="modal-title" class="text-2xl font-serif font-bold text-olea-900 mb-2">School Name</h3>
-                <span id="modal-rank" class="inline-block px-2 py-1 bg-olea-100 text-olea-800 text-xs font-bold rounded mb-4">Rank #1</span>
-                
-                <div class="mb-6">
-                    <h4 class="text-sm uppercase tracking-wide text-stone-500 font-bold mb-2">DNA Profile</h4>
-                    <!-- Chart Container -->
-                    <div class="chart-container">
-                        <canvas id="dnaChart"></canvas>
+    <!-- 1. QUIZ MODAL -->
+    <div id="quiz-modal" class="fixed inset-0 bg-olea-primary/80 backdrop-blur-sm hidden flex items-center justify-center z-[60] p-4 transition-opacity duration-300">
+        <div class="bg-olea-base rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden border border-olea-primary/20 relative">
+            <button onclick="closeQuiz()" class="absolute top-4 right-4 text-stone-400 hover:text-olea-primary transition">
+                <i class="fas fa-times fa-lg"></i>
+            </button>
+
+            <!-- Quiz Content -->
+            <div id="quiz-content" class="p-8 md:p-12">
+                <!-- Header -->
+                <div class="text-center mb-8">
+                    <span class="text-xs font-bold text-olea-secondary uppercase tracking-widest mb-2 block">Olea Archetype Assessment</span>
+                    <h3 id="quiz-question-title" class="text-2xl md:text-3xl font-display font-bold text-olea-primary leading-tight">
+                        Question Text Here
+                    </h3>
+                    <div class="w-full bg-stone-200 h-1.5 rounded-full mt-6 overflow-hidden">
+                        <div id="quiz-progress" class="bg-olea-primary h-full transition-all duration-300 w-0"></div>
                     </div>
                 </div>
 
-                <div class="mt-4">
-                    <button id="compare-btn" class="w-full py-2 bg-stone-800 text-white rounded hover:bg-stone-700 transition text-sm mb-4">
-                        <i class="fas fa-plus mr-2"></i> Add to Comparison
-                    </button>
-                    
-                    <div class="bg-olea-50 p-4 rounded-md border border-olea-100">
-                        <div class="flex justify-between items-center mb-2">
-                            <h5 class="text-xs font-bold text-olea-800 uppercase"><i class="fas fa-microscope mr-1"></i> Evidence Markers</h5>
-                            <button onclick="fetchLatestIntel()" class="text-[10px] bg-white border border-olea-200 text-olea-700 px-2 py-1 rounded hover:bg-olea-100 transition" title="Use Google Search to find current prompts">
-                                ✨ Live Intel
-                            </button>
-                        </div>
-                        <ul id="modal-evidence" class="text-xs text-stone-700 space-y-2 list-disc pl-4 mb-2">
-                            <!-- Static Evidence -->
-                        </ul>
-                        <div id="intel-loader" class="hidden text-center py-2">
-                            <i class="fas fa-circle-notch fa-spin text-olea-500 text-xs"></i>
-                        </div>
-                        <div id="live-intel-result" class="hidden text-[10px] text-stone-600 border-t border-olea-200 pt-2 mt-2 leading-tight">
-                            <!-- Search results go here -->
-                        </div>
-                    </div>
+                <!-- Options -->
+                <div id="quiz-options" class="space-y-3">
+                    <!-- Options injected here -->
                 </div>
             </div>
 
-            <!-- Modal Content (Text Analysis + AI Tool) -->
-            <div class="w-full md:w-2/3 p-8 overflow-y-auto custom-scrollbar flex flex-col h-full">
-                <button onclick="closeModal()" class="absolute top-4 right-4 text-stone-400 hover:text-stone-800">
-                    <i class="fas fa-times fa-lg"></i>
+            <!-- Quiz Results (Hidden initially) -->
+            <div id="quiz-result" class="hidden p-8 md:p-12 text-center fade-in">
+                <div class="w-20 h-20 bg-olea-light rounded-full flex items-center justify-center mx-auto mb-6 text-olea-primary">
+                    <i id="result-icon" class="fas fa-compass fa-3x"></i>
+                </div>
+                <h2 class="text-3xl font-display font-bold text-olea-primary mb-2">You are a <span id="result-archetype" class="text-olea-secondary italic">Archetype</span></h2>
+                <p id="result-description" class="text-stone-600 mb-8 max-w-md mx-auto leading-relaxed">
+                    Description goes here.
+                </p>
+                
+                <button onclick="applyQuizResult()" class="px-8 py-3 bg-olea-primary text-olea-base font-bold rounded-lg hover:bg-olea-hover transition shadow-lg w-full md:w-auto">
+                    Show My School Cluster
+                </button>
+                <div class="mt-4">
+                     <button onclick="resetQuiz()" class="text-xs text-stone-400 hover:text-stone-600 underline">Retake Quiz</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. SCHOOL DETAIL MODAL -->
+    <div id="school-modal" class="fixed inset-0 bg-olea-primary/40 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4 transition-opacity duration-300">
+        <div class="bg-olea-base rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col md:flex-row border border-olea-primary/10">
+            
+            <!-- Modal Sidebar (Visuals) -->
+            <div class="w-full md:w-1/3 bg-white p-6 border-r border-olea-primary/10 overflow-y-auto custom-scrollbar flex flex-col">
+                <div class="mb-auto">
+                    <h3 id="modal-title" class="text-3xl font-display font-bold text-olea-primary mb-1">School Name</h3>
+                    <span id="modal-rank" class="inline-block px-3 py-1 bg-olea-light text-olea-primary text-xs font-bold rounded-full mb-6 tracking-wide">Rank #1</span>
+                    
+                    <div class="mb-6">
+                        <h4 class="text-xs uppercase tracking-widest text-stone-400 font-bold mb-3">DNA Profile</h4>
+                        <!-- Chart Container -->
+                        <div class="chart-container">
+                            <canvas id="dnaChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-olea-base p-5 rounded-lg border border-olea-primary/10">
+                        <h5 class="text-xs font-bold text-olea-primary uppercase mb-3 flex items-center">
+                            <i class="fas fa-microscope mr-2 text-olea-secondary"></i> Evidence Markers
+                        </h5>
+                        <ul id="modal-evidence" class="text-sm text-stone-700 space-y-3 list-disc pl-4 marker:text-olea-secondary">
+                            <!-- Static Evidence -->
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-6 border-t border-stone-100">
+                    <button id="compare-btn" class="w-full py-3 bg-olea-primary text-olea-base rounded-lg hover:bg-olea-hover transition text-sm font-semibold tracking-wide shadow-lg flex items-center justify-center gap-2">
+                        <i class="fas fa-plus"></i> Add to Comparison
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Content (Text Analysis) -->
+            <div class="w-full md:w-2/3 p-8 overflow-y-auto custom-scrollbar relative bg-olea-base">
+                <button onclick="closeModal()" class="absolute top-6 right-6 text-stone-400 hover:text-olea-primary transition duration-200">
+                    <i class="fas fa-times fa-2x"></i>
                 </button>
 
-                <div class="mb-6">
-                    <h4 class="text-xs font-bold text-olea-600 uppercase tracking-widest mb-1">Reductionist Persona</h4>
-                    <p id="modal-persona" class="text-2xl font-serif text-stone-800 italic leading-snug">
+                <div class="mb-10 pr-10">
+                    <h4 class="text-xs font-bold text-olea-secondary uppercase tracking-widest mb-2">Reductionist Persona</h4>
+                    <p id="modal-persona" class="text-3xl font-display font-medium text-olea-primary italic leading-snug">
                         "The Description Goes Here."
                     </p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div>
-                        <h4 class="text-sm font-bold text-stone-900 border-b-2 border-olea-200 pb-2 mb-3">Decode the DNA</h4>
-                        <p id="modal-dna-desc" class="text-stone-600 text-sm leading-relaxed mb-4">
+                        <h4 class="text-sm font-bold text-olea-primary border-b-2 border-olea-primary/20 pb-3 mb-4 uppercase tracking-wide">Decode the DNA</h4>
+                        <p id="modal-dna-desc" class="text-stone-700 text-base leading-relaxed mb-4 font-light">
                             Analysis of why this persona fits.
                         </p>
                     </div>
 
                     <div>
-                        <h4 class="text-sm font-bold text-stone-900 border-b-2 border-olea-200 pb-2 mb-3">Application Strategy</h4>
-                        <p class="text-xs text-stone-500 italic mb-2">"Admissions Officer Perspective"</p>
-                        <p id="modal-strategy" class="text-stone-700 text-sm leading-relaxed font-medium">
+                        <h4 class="text-sm font-bold text-olea-primary border-b-2 border-olea-primary/20 pb-3 mb-4 uppercase tracking-wide">Application Strategy</h4>
+                        <p class="text-xs text-stone-500 uppercase font-semibold mb-2">Admissions Officer Perspective</p>
+                        <p id="modal-strategy" class="text-stone-700 text-base leading-relaxed font-medium">
                             Strategic advice on how to frame the narrative.
                         </p>
                         
-                        <div class="mt-4">
-                            <h5 class="text-xs font-bold text-stone-900 uppercase mb-2">Keyword Resonance</h5>
+                        <div class="mt-8">
+                            <h5 class="text-xs font-bold text-stone-400 uppercase mb-3 tracking-widest">Keyword Resonance</h5>
                             <div id="modal-keywords" class="flex flex-wrap gap-2">
                                 <!-- Keywords injected here -->
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- AI Section: Tabbed Interface -->
-                <div class="mt-auto pt-4 border-t-2 border-stone-100">
-                    <!-- Tabs -->
-                    <div class="flex gap-4 mb-3 border-b border-stone-200">
-                        <button onclick="switchAITab('narrative')" id="tab-narrative" class="pb-2 text-sm font-bold tab-active transition">
-                            <span>✨</span> Narrative Architect
-                        </button>
-                        <button onclick="switchAITab('activity')" id="tab-activity" class="pb-2 text-sm font-bold tab-inactive transition">
-                            <span>✨</span> Activity Refiner
-                        </button>
-                    </div>
-
-                    <!-- Narrative Architect (Default) -->
-                    <div id="ai-tool-narrative" class="bg-gradient-to-r from-stone-50 to-olea-50 rounded-lg p-5 border border-olea-100 shadow-sm">
-                        <p class="text-xs text-stone-500 mb-3">
-                            Describe the student's primary interest/spike (e.g., "Robotics & Jazz"). 
-                            The AI will generate a strategic angle tailored to <span id="ai-school-name-1" class="font-bold">this school</span>.
-                        </p>
-                        <div class="flex flex-col gap-2">
-                            <textarea id="ai-input-narrative" rows="2" placeholder="Enter student spike/interests here..." class="w-full text-sm p-3 rounded border border-stone-300 focus:ring-2 focus:ring-olea-500 focus:outline-none resize-none"></textarea>
-                            <button onclick="generateAINarrative()" class="self-end px-4 py-2 bg-gradient-to-r from-olea-600 to-olea-500 text-white text-xs font-bold rounded hover:from-olea-700 hover:to-olea-600 transition shadow-sm flex items-center gap-2">
-                                <span>✨</span> Generate Strategy
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Activity Refiner (Hidden) -->
-                    <div id="ai-tool-activity" class="bg-gradient-to-r from-stone-50 to-amber-50 rounded-lg p-5 border border-amber-100 shadow-sm hidden">
-                        <p class="text-xs text-stone-500 mb-3">
-                            Paste a raw activity description (e.g., "President of Debate Club"). 
-                            The AI will rewrite it to mimic <span id="ai-school-name-2" class="font-bold">this school's</span> specific institutional language.
-                        </p>
-                        <div class="flex flex-col gap-2">
-                            <textarea id="ai-input-activity" rows="2" placeholder="Paste raw activity description here..." class="w-full text-sm p-3 rounded border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:outline-none resize-none"></textarea>
-                            <button onclick="generateAIActivity()" class="self-end px-4 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white text-xs font-bold rounded hover:from-amber-700 hover:to-amber-600 transition shadow-sm flex items-center gap-2">
-                                <span>✨</span> Refine Description
-                            </button>
-                        </div>
-                    </div>
-                        
-                    <!-- AI Result Area (Shared) -->
-                    <div id="ai-result-container" class="mt-4 hidden">
-                        <div id="ai-loader" class="flex items-center gap-1 text-olea-600 justify-center py-4 hidden">
-                            <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
-                            <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
-                            <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
-                        </div>
-                        <div id="ai-response" class="text-sm text-stone-800 bg-white p-4 rounded border border-olea-200 leading-relaxed font-serif italic">
-                            <!-- Content goes here -->
                         </div>
                     </div>
                 </div>
@@ -303,59 +281,32 @@
     </div>
 
     <!-- Comparison Tray -->
-    <div id="comparison-tray" class="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-olea-600 shadow-xl transform translate-y-full transition-transform duration-300 z-40 flex flex-col h-[320px]">
-        <div class="container mx-auto px-4 py-3 flex-grow flex flex-col">
-            <div class="flex justify-between items-center mb-2">
-                <h3 class="text-lg font-serif font-bold text-olea-900 flex items-center gap-2">
+    <div id="comparison-tray" class="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-olea-primary shadow-[0_-10px_40px_rgba(0,0,0,0.1)] transform translate-y-full transition-transform duration-300 z-40">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-display font-bold text-olea-primary flex items-center gap-3">
                     Strategic Comparison
-                    <span id="compare-count" class="text-xs bg-olea-100 text-olea-800 px-2 py-0.5 rounded-full">0/2</span>
+                    <span id="compare-count" class="text-xs bg-olea-light text-olea-primary px-3 py-1 rounded-full font-sans font-bold">0/2</span>
                 </h3>
-                <button onclick="toggleComparison()" class="text-stone-500 hover:text-stone-800 p-2">
+                <button onclick="toggleComparison()" class="text-stone-400 hover:text-olea-primary transition p-2">
                     <i class="fas fa-chevron-down"></i>
                 </button>
             </div>
             
-            <div class="flex-grow flex gap-4 overflow-hidden relative">
+            <div class="grid grid-cols-2 gap-8 h-48">
                 <!-- Slot 1 -->
-                <div id="slot-1" class="flex-1 bg-stone-50 p-4 rounded border border-stone-200 overflow-y-auto custom-scrollbar">
-                    <p class="text-center text-stone-400 italic mt-10">Select a school to compare</p>
+                <div id="slot-1" class="bg-olea-base p-5 rounded-lg border border-olea-primary/10 relative overflow-y-auto custom-scrollbar">
+                    <p class="text-center text-stone-400 font-light italic mt-16">Select a school to compare</p>
                 </div>
                 
-                <!-- Center Action (AI) -->
-                <div class="w-12 flex flex-col justify-center items-center z-10">
-                    <div class="h-full w-[1px] bg-stone-200 absolute left-1/2 transform -translate-x-1/2"></div>
-                    <button onclick="generateComparisonStrategy()" id="compare-ai-btn" class="relative z-20 w-10 h-10 rounded-full bg-white border-2 border-olea-500 text-olea-600 shadow-md hover:bg-olea-50 flex items-center justify-center transition disabled:opacity-50 disabled:cursor-not-allowed" disabled title="Select 2 schools to generate strategy">
-                        <span>✨</span>
-                    </button>
-                </div>
-
                 <!-- Slot 2 -->
-                <div id="slot-2" class="flex-1 bg-stone-50 p-4 rounded border border-stone-200 overflow-y-auto custom-scrollbar">
-                    <p class="text-center text-stone-400 italic mt-10">Select a second school</p>
+                <div id="slot-2" class="bg-olea-base p-5 rounded-lg border border-olea-primary/10 relative overflow-y-auto custom-scrollbar">
+                    <p class="text-center text-stone-400 font-light italic mt-16">Select a second school</p>
                 </div>
             </div>
             
-            <div class="mt-2 text-center flex justify-between items-center text-xs">
-                <span class="text-stone-400">Click ✨ to synthesize a differentiation strategy.</span>
-                <button onclick="clearComparison()" class="text-red-500 hover:underline">Clear Selection</button>
-            </div>
-        </div>
-
-        <!-- AI Overlay for Comparison Result -->
-        <div id="comparison-ai-result" class="absolute inset-0 bg-white/95 backdrop-blur z-50 p-6 flex flex-col hidden">
-            <div class="flex justify-between items-center mb-4 border-b border-stone-200 pb-2">
-                <h4 class="font-bold text-olea-900">✨ Strategic Differentiator</h4>
-                <button onclick="closeComparisonAI()" class="text-stone-400 hover:text-stone-800">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div id="comparison-loader" class="flex items-center gap-1 text-olea-600 justify-center py-10 hidden">
-                <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
-                <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
-                <div class="w-2 h-2 bg-olea-600 rounded-full typing-dot"></div>
-            </div>
-            <div id="comparison-text" class="flex-grow overflow-y-auto custom-scrollbar text-sm text-stone-800 font-serif leading-relaxed px-4">
-                <!-- AI Content -->
+            <div class="mt-3 text-center">
+                <button onclick="clearComparison()" class="text-xs text-red-400 hover:text-red-600 font-bold uppercase tracking-wide transition">Clear Selection</button>
             </div>
         </div>
     </div>
@@ -849,8 +800,6 @@
         let currentFilter = 'All';
         let comparisonSlots = [null, null];
         let radarChart = null;
-        let currentSchoolIdForAI = null;
-        const apiKey = ""; // Injected by environment
 
         document.addEventListener('DOMContentLoaded', () => {
             renderGrid(universities);
@@ -863,12 +812,17 @@
             // Update button styles
             const buttons = document.querySelectorAll('#filter-container button');
             buttons.forEach(btn => {
-                if(btn.innerText.includes(category) || (category === 'All' && btn.innerText === 'All')) {
-                    btn.classList.remove('bg-stone-200', 'text-stone-700');
-                    btn.classList.add('bg-olea-800', 'text-white');
+                const text = btn.innerText;
+                // Check if button text matches category OR contains category keyword
+                const isMatch = (category === 'All' && text === 'All') || 
+                                text.includes(category);
+                
+                if(isMatch) {
+                    // Active State (Brand Primary)
+                    btn.className = "px-5 py-2 rounded-full text-sm font-semibold bg-olea-primary text-olea-base transition shadow-md hover:bg-olea-hover ring-1 ring-olea-primary";
                 } else {
-                    btn.classList.add('bg-stone-200', 'text-stone-700');
-                    btn.classList.remove('bg-olea-800', 'text-white');
+                    // Inactive State
+                    btn.className = "px-5 py-2 rounded-full text-sm font-medium bg-white text-stone-600 border border-stone-200 transition hover:bg-olea-light hover:text-olea-primary hover:border-olea-primary";
                 }
             });
 
@@ -887,29 +841,32 @@
 
             data.forEach(school => {
                 const card = document.createElement('div');
-                card.className = 'bg-white rounded-lg shadow-sm border border-stone-200 p-6 card-hover cursor-pointer flex flex-col justify-between h-full';
+                card.className = 'bg-white rounded-xl p-6 card-hover cursor-pointer flex flex-col justify-between h-full border border-stone-100 shadow-sm relative overflow-hidden group';
                 card.onclick = () => openModal(school.id);
                 
                 // Determine badge color
-                let badgeColor = 'bg-stone-100 text-stone-600';
-                if(school.category === 'Intellectual') badgeColor = 'bg-purple-100 text-purple-800';
-                if(school.category === 'Leadership') badgeColor = 'bg-blue-100 text-blue-800';
-                if(school.category === 'Civic') badgeColor = 'bg-green-100 text-green-800';
-                if(school.category === 'Innovation') badgeColor = 'bg-amber-100 text-amber-800';
-                if(school.category === 'Pre-Professional') badgeColor = 'bg-red-100 text-red-800';
+                let badgeClass = 'bg-stone-100 text-stone-600';
+                if(school.category === 'Intellectual') badgeClass = 'bg-purple-50 text-purple-800 border-purple-100';
+                if(school.category === 'Leadership') badgeClass = 'bg-blue-50 text-blue-800 border-blue-100';
+                if(school.category === 'Civic') badgeClass = 'bg-green-50 text-green-800 border-green-100';
+                if(school.category === 'Innovation') badgeClass = 'bg-amber-50 text-amber-800 border-amber-100';
+                if(school.category === 'Pre-Professional') badgeClass = 'bg-red-50 text-red-800 border-red-100';
 
                 card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs font-bold text-stone-400">Rank #${school.rank}</span>
-                            <span class="text-[10px] uppercase font-bold px-2 py-1 rounded ${badgeColor}">${school.category}</span>
-                        </div>
-                        <h3 class="text-xl font-serif font-bold text-olea-900 mb-2">${school.name}</h3>
-                        <p class="text-sm text-stone-600 italic mb-4">"${school.persona}"</p>
+                    <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition duration-300">
+                        <i class="fas fa-university fa-3x text-olea-primary"></i>
                     </div>
-                    <div class="mt-4 pt-4 border-t border-stone-100 flex justify-between items-center text-xs text-olea-600 font-bold uppercase tracking-wide">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-xs font-bold text-stone-400 uppercase tracking-wider">Rank #${school.rank}</span>
+                            <span class="text-[10px] uppercase font-bold px-2 py-1 rounded border ${badgeClass}">${school.category}</span>
+                        </div>
+                        <h3 class="text-xl font-display font-bold text-olea-primary mb-2 leading-tight group-hover:text-olea-secondary transition">${school.name}</h3>
+                        <p class="text-sm text-stone-600 italic mb-4 font-light leading-relaxed">"${school.persona}"</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-stone-100 flex justify-between items-center text-xs text-olea-primary font-bold uppercase tracking-widest group-hover:translate-x-1 transition duration-300">
                         <span>Decode DNA</span>
-                        <i class="fas fa-arrow-right"></i>
+                        <i class="fas fa-arrow-right text-olea-secondary"></i>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -921,32 +878,19 @@
             const school = universities.find(u => u.id === id);
             if(!school) return;
 
-            currentSchoolIdForAI = id; // Set for AI use
-
             document.getElementById('modal-title').innerText = school.name;
             document.getElementById('modal-rank').innerText = `US News Rank: #${school.rank}`;
             document.getElementById('modal-persona').innerText = `"${school.persona}"`;
             document.getElementById('modal-dna-desc').innerText = school.description;
             document.getElementById('modal-strategy').innerText = school.strategy;
             
-            // Set AI Text
-            document.getElementById('ai-school-name-1').innerText = school.name;
-            document.getElementById('ai-school-name-2').innerText = school.name;
-            document.getElementById('ai-input-narrative').value = ''; 
-            document.getElementById('ai-input-activity').value = ''; 
-            document.getElementById('ai-result-container').classList.add('hidden'); 
-            
-            // Reset Intel
-            document.getElementById('live-intel-result').classList.add('hidden');
-            document.getElementById('live-intel-result').innerHTML = '';
-
             // Evidence List
             const evidenceList = document.getElementById('modal-evidence');
             evidenceList.innerHTML = school.evidence.map(e => `<li>${e}</li>`).join('');
 
             // Keywords
             const kwContainer = document.getElementById('modal-keywords');
-            kwContainer.innerHTML = school.keywords.map(k => `<span class="px-2 py-1 bg-stone-100 text-stone-600 rounded text-[10px] uppercase tracking-wide">${k}</span>`).join('');
+            kwContainer.innerHTML = school.keywords.map(k => `<span class="px-3 py-1 bg-stone-100 text-stone-600 rounded text-[10px] uppercase tracking-wide font-bold">${k}</span>`).join('');
 
             // Compare Button Logic
             const compareBtn = document.getElementById('compare-btn');
@@ -954,9 +898,6 @@
 
             // Chart
             renderChart(school);
-
-            // Switch to default tab
-            switchAITab('narrative');
 
             document.getElementById('school-modal').classList.remove('hidden');
         }
@@ -980,9 +921,12 @@
                     datasets: [{
                         label: school.name,
                         data: school.scores,
-                        backgroundColor: 'rgba(83, 130, 83, 0.5)', // Olea-500
-                        borderColor: '#538253',
-                        pointBackgroundColor: '#233623',
+                        backgroundColor: 'rgba(18, 61, 7, 0.2)', // Olea-Primary Transparent
+                        borderColor: '#123d07', // Olea-Primary
+                        pointBackgroundColor: '#123d07',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#123d07',
                         borderWidth: 2
                     }]
                 },
@@ -994,16 +938,20 @@
                             min: 0,
                             max: 10,
                             ticks: {
-                                display: false // Hide numbers for cleaner look
+                                display: false
                             },
                             grid: {
-                                color: '#e5e7eb'
+                                color: '#e5e0d8' // Stone-200
+                            },
+                            angleLines: {
+                                color: '#e5e0d8'
                             },
                             pointLabels: {
                                 font: {
                                     size: 11,
-                                    family: 'sans-serif'
-                                }
+                                    family: 'Gantari'
+                                },
+                                color: '#292524' // Stone-800
                             }
                         }
                     },
@@ -1025,9 +973,8 @@
         }
 
         function addToComparison(school) {
-            // Check if already in
             if(comparisonSlots[0]?.id === school.id || comparisonSlots[1]?.id === school.id) {
-                alert("School already in comparison tray.");
+                // Shake effect or simple alert
                 return;
             }
 
@@ -1037,14 +984,12 @@
             } else if (!comparisonSlots[1]) {
                 comparisonSlots[1] = school;
             } else {
-                // Shift: Remove first, add new to second
                 comparisonSlots[0] = comparisonSlots[1];
                 comparisonSlots[1] = school;
             }
 
             renderComparisonTray();
             
-            // Show tray if hidden
             const tray = document.getElementById('comparison-tray');
             tray.classList.remove('translate-y-full');
         }
@@ -1058,282 +1003,201 @@
                 if(school) {
                     count++;
                     slotDiv.innerHTML = `
-                        <div class="flex justify-between items-start">
-                            <h4 class="font-serif font-bold text-olea-900">${school.name}</h4>
-                            <button onclick="removeComparison(${index})" class="text-xs text-red-400 hover:text-red-600">Remove</button>
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-display font-bold text-olea-primary text-lg">${school.name}</h4>
+                            <button onclick="removeComparison(${index})" class="text-xs text-red-400 hover:text-red-600 transition"><i class="fas fa-times"></i></button>
                         </div>
-                        <p class="text-xs font-bold text-stone-500 uppercase mt-1">${school.persona}</p>
-                        <p class="text-xs text-stone-700 mt-2 line-clamp-3">${school.description}</p>
-                        <div class="mt-2 text-[10px] text-olea-700">
-                             <strong>Spike:</strong> ${school.category}
+                        <p class="text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">${school.persona}</p>
+                        <p class="text-sm text-stone-700 leading-snug line-clamp-3 font-light">${school.description}</p>
+                        <div class="mt-3 inline-block px-2 py-1 bg-stone-100 rounded text-[10px] uppercase font-bold text-stone-500">
+                             Spike: ${school.category}
                         </div>
                     `;
                 } else {
-                    slotDiv.innerHTML = `<p class="text-center text-stone-400 italic mt-10">Select a school to compare</p>`;
+                    slotDiv.innerHTML = `<p class="text-center text-stone-400 font-light italic mt-16">Select a school to compare</p>`;
                 }
             });
 
             document.getElementById('compare-count').innerText = `${count}/2`;
-            const compareAiBtn = document.getElementById('compare-ai-btn');
-            if(count === 2) {
-                compareAiBtn.disabled = false;
-                compareAiBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                compareAiBtn.classList.add('animate-pulse'); // Add pulse to draw attention
-            } else {
-                compareAiBtn.disabled = true;
-                compareAiBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                compareAiBtn.classList.remove('animate-pulse');
-            }
         }
 
         function removeComparison(index) {
             comparisonSlots[index] = null;
             renderComparisonTray();
-            closeComparisonAI(); // Close overlay if removing a school
         }
         
         function clearComparison() {
             comparisonSlots = [null, null];
             renderComparisonTray();
-            closeComparisonAI();
+        }
+
+        // --- 5. PERSONALITY QUIZ LOGIC ---
+        
+        const quizData = [
+            {
+                question: "It's Friday night. You have free time. What are you most likely doing?",
+                options: [
+                    { text: "Debating a niche philosophical topic or reading obscure literature.", category: "Intellectual" },
+                    { text: "Hacking together a side project or coding a new app idea.", category: "Innovation" },
+                    { text: "Organizing a club event or rallying a team for a cause.", category: "Leadership" },
+                    { text: "Volunteering at a local shelter or planning a community service trip.", category: "Civic" },
+                    { text: "Networking with professionals or working on a business plan.", category: "Pre-Professional" }
+                ]
+            },
+            {
+                question: "In a classroom, what frustrates you the most?",
+                options: [
+                    { text: "When the discussion is too practical and lacks theoretical depth.", category: "Intellectual" },
+                    { text: "When we just talk and don't *make* anything.", category: "Innovation" },
+                    { text: "When there's no clear direction or goal for the group.", category: "Leadership" },
+                    { text: "When the topic feels disconnected from helping real people.", category: "Civic" },
+                    { text: "When the material feels useless for my future career.", category: "Pre-Professional" }
+                ]
+            },
+            {
+                question: "If you were given $10,000 to start a project, what would it be?",
+                options: [
+                    { text: "A research grant to study a specific historical event or scientific phenomenon.", category: "Intellectual" },
+                    { text: "A startup fund to prototype a new invention.", category: "Innovation" },
+                    { text: "A campaign budget to run for student government or lead a movement.", category: "Leadership" },
+                    { text: "A donation to a non-profit or starting a community garden.", category: "Civic" },
+                    { text: "Seed money to start a profitable small business or investment portfolio.", category: "Pre-Professional" }
+                ]
+            },
+            {
+                question: "What do you value most in a peer?",
+                options: [
+                    { text: "Deep curiosity and intellect.", category: "Intellectual" },
+                    { text: "Creativity and the ability to build things.", category: "Innovation" },
+                    { text: "Charisma and the ability to influence others.", category: "Leadership" },
+                    { text: "Empathy and a desire to serve.", category: "Civic" },
+                    { text: "Ambition and career focus.", category: "Pre-Professional" }
+                ]
+            },
+            {
+                question: "What is your ultimate goal for college?",
+                options: [
+                    { text: "To become a scholar and contribute to human knowledge.", category: "Intellectual" },
+                    { text: "To disrupt an industry and create something new.", category: "Innovation" },
+                    { text: "To gain the skills to lead large organizations or governments.", category: "Leadership" },
+                    { text: "To learn how to make the world a better, more just place.", category: "Civic" },
+                    { text: "To secure a high-paying job and build a strong professional network.", category: "Pre-Professional" }
+                ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let scores = {
+            "Intellectual": 0,
+            "Innovation": 0,
+            "Leadership": 0,
+            "Civic": 0,
+            "Pre-Professional": 0
+        };
+        let determinedArchetype = "";
+
+        const archetypeDescriptions = {
+            "Intellectual": "You are a **Theorist**. You value deep inquiry, abstract concepts, and the pursuit of knowledge for its own sake. You thrive in environments that challenge your mind and respect tradition.",
+            "Innovation": "You are a **Maker**. You learn by doing. You value creativity, disruption, and practical application. You thrive in environments that allow you to break rules and build things.",
+            "Leadership": "You are a **Leader**. You are driven to influence and organize. You value social structures, tradition, and impact. You thrive in high-energy environments where you can take charge.",
+            "Civic": "You are a **Citizen**. You are driven by a sense of duty and community. You value kindness, service, and social justice. You thrive in collaborative, supportive environments.",
+            "Pre-Professional": "You are a **Pragmatist**. You are focused on outcomes. You value efficiency, networking, and career preparation. You thrive in environments that connect you to the real world."
+        };
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            scores = { "Intellectual": 0, "Innovation": 0, "Leadership": 0, "Civic": 0, "Pre-Professional": 0 };
+            document.getElementById('quiz-result').classList.add('hidden');
+            document.getElementById('quiz-content').classList.remove('hidden');
+            document.getElementById('quiz-modal').classList.remove('hidden');
+            renderQuestion();
+        }
+
+        function closeQuiz() {
+            document.getElementById('quiz-modal').classList.add('hidden');
+        }
+
+        function renderQuestion() {
+            const q = quizData[currentQuestionIndex];
+            document.getElementById('quiz-question-title').innerText = q.question;
+            
+            // Update Progress Bar
+            const progress = ((currentQuestionIndex) / quizData.length) * 100;
+            document.getElementById('quiz-progress').style.width = `${progress}%`;
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-lg border border-stone-200 hover:border-olea-primary hover:bg-olea-light transition flex items-center group";
+                btn.onclick = () => handleAnswer(opt.category);
+                btn.innerHTML = `
+                    <span class="w-6 h-6 rounded-full border-2 border-stone-300 mr-4 group-hover:border-olea-primary flex-shrink-0"></span>
+                    <span class="text-stone-700 font-medium group-hover:text-olea-primary">${opt.text}</span>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(category) {
+            scores[category]++;
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < quizData.length) {
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-content').classList.add('hidden');
+            document.getElementById('quiz-result').classList.remove('hidden');
+            
+            // Find highest score
+            determinedArchetype = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+            
+            document.getElementById('result-archetype').innerText = determinedArchetype === "Intellectual" ? "Theorist" : 
+                                                                    determinedArchetype === "Innovation" ? "Maker" :
+                                                                    determinedArchetype === "Leadership" ? "Leader" :
+                                                                    determinedArchetype === "Civic" ? "Citizen" : "Pragmatist";
+            
+            document.getElementById('result-description').innerHTML = archetypeDescriptions[determinedArchetype].replace(/\*\*(.*?)\*\*/g, '<strong class="text-olea-primary">$1</strong>');
+            
+            // Set Icon
+            const iconMap = {
+                "Intellectual": "fa-brain",
+                "Innovation": "fa-lightbulb",
+                "Leadership": "fa-chess-king",
+                "Civic": "fa-hands-helping",
+                "Pre-Professional": "fa-briefcase"
+            };
+            document.getElementById('result-icon').className = `fas ${iconMap[determinedArchetype]} fa-3x`;
+        }
+
+        function applyQuizResult() {
+            closeQuiz();
+            filterSchools(determinedArchetype);
+            // Scroll to grid
+            document.getElementById('school-grid').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetQuiz() {
+            startQuiz();
         }
 
         // Close modal on outside click
         window.onclick = function(event) {
             const modal = document.getElementById('school-modal');
+            const quizModal = document.getElementById('quiz-modal');
             if (event.target == modal) {
                 closeModal();
             }
-        }
-
-        // --- 5. GEMINI API INTEGRATION ---
-
-        async function callGeminiAPI(promptText, useSearch = false) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            
-            const payload = {
-                contents: [{ parts: [{ text: promptText }] }]
-            };
-
-            if (useSearch) {
-                payload.tools = [{ "google_search": {} }];
-            }
-
-            // Retry logic
-            let retries = 0;
-            const maxRetries = 5;
-            const delays = [1000, 2000, 4000, 8000, 16000];
-
-            while (retries <= maxRetries) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        if (response.status === 429) {
-                            throw new Error("Rate limit exceeded");
-                        }
-                        throw new Error(`API Error: ${response.statusText}`);
-                    }
-
-                    const data = await response.json();
-                    
-                    // Extract grounding metadata if present
-                    const grounding = data.candidates?.[0]?.groundingMetadata;
-                    let text = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
-                    
-                    if (grounding && grounding.groundingAttributions) {
-                        const sources = grounding.groundingAttributions
-                            .filter(a => a.web && a.web.uri && a.web.title)
-                            .map(a => `<a href="${a.web.uri}" target="_blank" class="text-olea-600 hover:underline">[${a.web.title}]</a>`)
-                            .join(' ');
-                        if(sources) text += `<br><br><small>Sources: ${sources}</small>`;
-                    }
-
-                    return text;
-                } catch (error) {
-                    if (retries === maxRetries) {
-                        console.error("Max retries reached", error);
-                        return "Error: Unable to connect to Olea's AI Strategy Consultant. Please try again later.";
-                    }
-                    await new Promise(resolve => setTimeout(resolve, delays[retries]));
-                    retries++;
-                }
+            if (event.target == quizModal) {
+                closeQuiz();
             }
         }
-
-        // Tab Logic
-        function switchAITab(tab) {
-            const narrativeTab = document.getElementById('tab-narrative');
-            const activityTab = document.getElementById('tab-activity');
-            const narrativeTool = document.getElementById('ai-tool-narrative');
-            const activityTool = document.getElementById('ai-tool-activity');
-            
-            // Hide result when switching
-            document.getElementById('ai-result-container').classList.add('hidden');
-
-            if(tab === 'narrative') {
-                narrativeTab.classList.replace('tab-inactive', 'tab-active');
-                activityTab.classList.replace('tab-active', 'tab-inactive');
-                narrativeTool.classList.remove('hidden');
-                activityTool.classList.add('hidden');
-            } else {
-                activityTab.classList.replace('tab-inactive', 'tab-active');
-                narrativeTab.classList.replace('tab-active', 'tab-inactive');
-                activityTool.classList.remove('hidden');
-                narrativeTool.classList.add('hidden');
-            }
-        }
-
-        // Feature 1: Narrative Architect (Modal)
-        async function generateAINarrative() {
-            const school = universities.find(u => u.id === currentSchoolIdForAI);
-            const userInterest = document.getElementById('ai-input-narrative').value.trim();
-            const resultContainer = document.getElementById('ai-result-container');
-            const resultText = document.getElementById('ai-response');
-            const loader = document.getElementById('ai-loader');
-
-            if (!userInterest) {
-                alert("Please enter the student's interests first.");
-                return;
-            }
-
-            resultContainer.classList.remove('hidden');
-            resultText.innerHTML = '';
-            loader.classList.remove('hidden');
-
-            const prompt = `
-                Act as a ruthless Ivy League admissions consultant. 
-                Task: Suggest 2 distinct, high-level narrative 'hooks' or 'spikes' a student could use to appeal specifically to ${school.name}.
-                
-                Context:
-                - School Persona: ${school.persona}
-                - DNA Description: ${school.description}
-                - Student's Raw Interest: "${userInterest}"
-                
-                Instructions:
-                - Do not give generic advice.
-                - Explain exactly how to frame the "${userInterest}" to fit the "${school.persona}" archetype.
-                - Keep it under 150 words.
-                - Use HTML formatting (<b> for emphasis, <br> for new lines).
-            `;
-
-            const response = await callGeminiAPI(prompt, false);
-            const formattedResponse = response.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
-            
-            loader.classList.add('hidden');
-            resultText.innerHTML = formattedResponse;
-        }
-
-        // Feature 2: Activity Refiner (Modal)
-        async function generateAIActivity() {
-            const school = universities.find(u => u.id === currentSchoolIdForAI);
-            const userActivity = document.getElementById('ai-input-activity').value.trim();
-            const resultContainer = document.getElementById('ai-result-container');
-            const resultText = document.getElementById('ai-response');
-            const loader = document.getElementById('ai-loader');
-
-            if (!userActivity) {
-                alert("Please enter the activity description first.");
-                return;
-            }
-
-            resultContainer.classList.remove('hidden');
-            resultText.innerHTML = '';
-            loader.classList.remove('hidden');
-
-            const prompt = `
-                Act as a specialized admissions editor.
-                Task: Rewrite the following activity description to sound perfect for ${school.name}'s specific culture and values.
-                
-                Data:
-                - School Persona: ${school.persona} (${school.description})
-                - Raw Activity: "${userActivity}"
-                
-                Output:
-                1. Provide a "Refined Description" (150 chars max) suitable for the Common App.
-                2. Explain *why* this phrasing appeals to this specific school's DNA.
-                
-                Use HTML formatting.
-            `;
-
-            const response = await callGeminiAPI(prompt, false);
-            const formattedResponse = response.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
-            
-            loader.classList.add('hidden');
-            resultText.innerHTML = formattedResponse;
-        }
-
-        // Feature 3: Live Intel (Search Grounding)
-        async function fetchLatestIntel() {
-            const school = universities.find(u => u.id === currentSchoolIdForAI);
-            const resultDiv = document.getElementById('live-intel-result');
-            const loader = document.getElementById('intel-loader');
-
-            resultDiv.classList.add('hidden');
-            loader.classList.remove('hidden');
-
-            const prompt = `
-                Find the official supplemental essay prompts for ${school.name} for the 2024-2025 (or latest available) admissions cycle. 
-                Summarize them into a concise bulleted list. 
-                If you find a "Why Us" prompt, highlight it.
-            `;
-
-            const response = await callGeminiAPI(prompt, true); // true = useSearch
-            
-            // Basic formatting
-            const formattedResponse = response.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
-
-            loader.classList.add('hidden');
-            resultDiv.classList.remove('hidden');
-            resultDiv.innerHTML = formattedResponse;
-        }
-
-        // Feature 4: Strategic Differentiator (Comparison Tray)
-        async function generateComparisonStrategy() {
-            const schoolA = comparisonSlots[0];
-            const schoolB = comparisonSlots[1];
-            const overlay = document.getElementById('comparison-ai-result');
-            const loader = document.getElementById('comparison-loader');
-            const text = document.getElementById('comparison-text');
-
-            if (!schoolA || !schoolB) return;
-
-            overlay.classList.remove('hidden');
-            loader.classList.remove('hidden');
-            text.innerHTML = '';
-
-            const prompt = `
-                Act as a senior admissions strategist.
-                Task: Compare the application strategy for ${schoolA.name} vs. ${schoolB.name}.
-                
-                Data:
-                - School A: ${schoolA.name} (${schoolA.persona}) - "${schoolA.description}"
-                - School B: ${schoolB.name} (${schoolB.persona}) - "${schoolB.description}"
-                
-                Output:
-                1. Identify the core conflict or difference in values between these two schools.
-                2. Explain how the student must shift their tone/narrative when writing essays for School A versus School B.
-                
-                Constraint: Keep it under 150 words. Be direct and tactical. Use HTML formatting.
-            `;
-
-            const response = await callGeminiAPI(prompt, false);
-            const formattedResponse = response.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
-
-            loader.classList.add('hidden');
-            text.innerHTML = formattedResponse;
-        }
-
-        function closeComparisonAI() {
-            document.getElementById('comparison-ai-result').classList.add('hidden');
-        }
-
     </script>
 </body>
-    
 </html>
-
