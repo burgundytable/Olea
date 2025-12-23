@@ -57,10 +57,12 @@
         /* Filter Button Active State */
         .filter-btn.active { @apply bg-olea-primary text-white border-olea-primary; }
 
-        /* Choice Card Styles */
-        .choice-card { transition: all 0.2s ease-in-out; }
-        .choice-card:hover { transform: scale(1.02); border-color: #123d07; }
-        .choice-card.selected { background-color: #123d07; color: #f9f5ef; border-color: #123d07; }
+        /* Quiz Card Interactions */
+        .quiz-option-card { transition: all 0.2s ease; border: 2px solid #e5e7eb; }
+        .quiz-option-card:hover { border-color: #123d07; transform: translateY(-2px); }
+        
+        .quiz-btn { transition: all 0.2s; }
+        .quiz-btn:hover { transform: scale(1.05); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-olea-primary selection:text-white">
@@ -100,7 +102,7 @@
                     <i class="fas fa-fingerprint"></i> Full DNA Calibration (72)
                 </button>
                 <button onclick="document.getElementById('directory-section').scrollIntoView({behavior:'smooth'})" class="bg-white text-olea-primary border border-olea-primary/20 px-8 py-3 rounded-lg font-display font-bold shadow-sm hover:bg-olea-light transition duration-300">
-                    Browse Directory (50)
+                    Browse Directory (51)
                 </button>
             </div>
         </div>
@@ -217,9 +219,9 @@
         </div>
     </div>
 
-    <!-- MODAL: Diagnostic Quiz -->
+    <!-- MODAL: Diagnostic Quiz (Large UI) -->
     <div id="quiz-modal" class="fixed inset-0 bg-olea-primary/95 hidden z-[70] flex flex-col items-center justify-center p-4">
-        <div class="w-full max-w-4xl h-full md:h-auto">
+        <div class="w-full max-w-6xl h-full md:h-auto">
             <!-- Header -->
             <div class="flex justify-between items-end mb-6 text-olea-base px-4">
                 <div>
@@ -233,41 +235,48 @@
             </div>
 
             <!-- Card -->
-            <div id="quiz-card" class="bg-olea-base rounded-2xl shadow-2xl p-6 md:p-10 relative overflow-hidden min-h-[500px] flex flex-col justify-center">
+            <div id="quiz-card" class="bg-olea-base rounded-2xl shadow-2xl p-6 md:p-10 relative overflow-hidden min-h-[600px] flex flex-col justify-center">
                 <button onclick="closeQuiz()" class="absolute top-4 right-4 text-stone-300 hover:text-olea-primary z-10"><i class="fas fa-times"></i></button>
                 
                 <div id="quiz-question-container" class="fade-in">
-                    <p id="quiz-text" class="text-lg md:text-xl font-medium text-stone-500 mb-8 text-center italic">
+                    <p id="quiz-text" class="text-lg md:text-xl font-medium text-stone-500 mb-10 text-center italic max-w-2xl mx-auto">
                         Select the statement that resonates most with you.
                     </p>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
                         <!-- Option A Card -->
-                        <div onclick="selectSide('left')" id="card-left" class="choice-card bg-white p-6 rounded-xl border-2 border-stone-200 cursor-pointer flex flex-col justify-center items-center text-center h-48 group">
-                            <div class="w-8 h-8 rounded-full border-2 border-stone-300 mb-4 group-hover:bg-olea-primary group-hover:border-olea-primary transition-colors"></div>
-                            <span id="opt-1-text" class="text-lg font-display font-bold text-stone-700 group-hover:text-olea-primary">Option A Text</span>
+                        <div class="quiz-option-card bg-white p-8 rounded-xl cursor-default flex flex-col justify-between h-72 relative group">
+                            <div class="text-center">
+                                <span class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2 block">Option A</span>
+                                <p id="opt-1-text" class="text-2xl font-display font-bold text-olea-primary leading-tight">Option A Text</p>
+                            </div>
+                            
+                            <!-- Interaction Buttons (Bottom of Card) -->
+                            <div class="grid grid-cols-2 gap-3 mt-6">
+                                <button onclick="handleAnswer(1)" class="quiz-btn py-3 bg-olea-primary text-white rounded-lg font-bold text-sm uppercase tracking-wide shadow-md hover:bg-olea-hover">Strongly</button>
+                                <button onclick="handleAnswer(2)" class="quiz-btn py-3 bg-olea-light text-olea-primary border border-olea-primary/20 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-white">Leaning</button>
+                            </div>
                         </div>
 
                         <!-- Option B Card -->
-                        <div onclick="selectSide('right')" id="card-right" class="choice-card bg-white p-6 rounded-xl border-2 border-stone-200 cursor-pointer flex flex-col justify-center items-center text-center h-48 group">
-                            <div class="w-8 h-8 rounded-full border-2 border-stone-300 mb-4 group-hover:bg-olea-primary group-hover:border-olea-primary transition-colors"></div>
-                            <span id="opt-2-text" class="text-lg font-display font-bold text-stone-700 group-hover:text-olea-primary">Option B Text</span>
+                        <div class="quiz-option-card bg-white p-8 rounded-xl cursor-default flex flex-col justify-between h-72 relative group">
+                            <div class="text-center">
+                                <span class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2 block">Option B</span>
+                                <p id="opt-2-text" class="text-2xl font-display font-bold text-olea-primary leading-tight">Option B Text</p>
+                            </div>
+                            
+                            <!-- Interaction Buttons (Bottom of Card) -->
+                            <div class="grid grid-cols-2 gap-3 mt-6">
+                                <button onclick="handleAnswer(4)" class="quiz-btn py-3 bg-olea-light text-olea-primary border border-olea-primary/20 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-white">Leaning</button>
+                                <button onclick="handleAnswer(5)" class="quiz-btn py-3 bg-olea-primary text-white rounded-lg font-bold text-sm uppercase tracking-wide shadow-md hover:bg-olea-hover">Strongly</button>
+                            </div>
                         </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button onclick="handleAnswer(3)" class="text-xs text-stone-400 hover:text-stone-600 underline">I am truly neutral on this (Score 3)</button>
                     </div>
 
-                    <!-- Intensity Selector (Hidden until side selected) -->
-                    <div id="intensity-selector" class="hidden text-center fade-in">
-                        <p class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-4">How strongly?</p>
-                        <div class="flex justify-center gap-4">
-                            <button onclick="confirmAnswer(5)" class="px-6 py-3 bg-olea-primary text-white rounded-lg font-bold hover:bg-olea-hover transition shadow-md w-32">Strongly</button>
-                            <button onclick="confirmAnswer(4)" class="px-6 py-3 bg-white text-olea-primary border border-olea-primary rounded-lg font-bold hover:bg-olea-light transition shadow-sm w-32">Leaning</button>
-                            <!-- Neutral option kept hidden/small to discourage use unless specifically needed by user logic, 
-                                 but available if we want to implement a strict 5-pt scale. 
-                                 For now, forcing 4 or 5 aligns with "Forced Choice". 
-                                 Adding a small "Neutral" link below. -->
-                        </div>
-                        <button onclick="confirmAnswer(3)" class="text-xs text-stone-400 hover:text-stone-600 underline mt-4">I am genuinely split (Neutral)</button>
-                    </div>
                 </div>
 
                 <!-- Result View -->
@@ -306,9 +315,9 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // --- DATA: THE INSTITUTIONAL DNA (Top 50) ---
+        // --- DATA: THE INSTITUTIONAL DNA (Full 50+ Schools) ---
         const universities = [
-            // IVY LEAGUE
+            // IVY LEAGUE (8)
             { id: "princeton", name: "Princeton University", rank: 1, code: "CKFE-GU", persona: "The Conceptual Village", desc: "Theoretical, tight-knit, open path, traditional. The ultimate 'Undergrad Grove'.", strategy: "Emphasize pure theory and the Senior Thesis.", evidence: ["Senior Thesis Mandatory", "Eating Clubs"] },
             { id: "harvard", name: "Harvard University", rank: 3, code: "ASFE-MR", persona: "The Applied Star", desc: "Action-oriented, independent, flexible path. A massive 'Research Metro'.", strategy: "Show massive scale of impact and solo leadership.", evidence: ["Extension School", "Massive Endowment"] },
             { id: "yale", name: "Yale University", rank: 5, code: "CKFE-GU", persona: "The Humanist Village", desc: "Similar to Princeton but slightly more socially fluid. Traditional but supportive.", strategy: "Highlight 'Kinship' and the Residential Colleges.", evidence: ["Residential Colleges", "Global Strategy"] },
@@ -318,21 +327,21 @@
             { id: "dartmouth", name: "Dartmouth College", rank: 12, code: "AKDE-GU", persona: "The Loyal Captain", desc: "Applied/Active, intense kinship, directed (D-Plan), very traditional.", strategy: "Focus on the 'Grove' (Nature) and the D-Plan.", evidence: ["D-Plan", "Greek Life Dominance"] },
             { id: "cornell", name: "Cornell University", rank: 17, code: "ASDE-GR", persona: "The Vocational Giant", desc: "Applied, independent, structured (Colleges), traditional research-heavy.", strategy: "Fit to Major/College is critical.", evidence: ["Distinct Colleges", "Any Person Any Study"] },
 
-            // TECH & INNOVATION
+            // TECH & INNOVATION (5)
             { id: "mit", name: "MIT", rank: 2, code: "AKDV-MR", persona: "The Collaborative Hacker", desc: "Applied, collaborative (Kinship via suffering), structured, visionary.", strategy: "Mens et Manus. Show you build things with others.", evidence: ["Hacks", "Mens et Manus"] },
             { id: "stanford", name: "Stanford University", rank: 3, code: "ASFV-GR", persona: "The Visionary Star", desc: "Applied/Entrepreneurial, independent, fluid path. Visionary status.", strategy: "Intellectual Vitality + Innovation.", evidence: ["Silicon Valley", "D-School"] },
             { id: "caltech", name: "Caltech", rank: 9, code: "CSDV-GR", persona: "The Pure Scientist", desc: "Conceptual/Theory-heavy, solo/intense, highly directed, visionary science.", strategy: "Pure 'Conceptual' rigor. Honor code.", evidence: ["Honor Code", "House System"] },
             { id: "cmu", name: "Carnegie Mellon", rank: 22, code: "AKDV-MR", persona: "The Interdisciplinary Specialist", desc: "Applied, kinship (within majors), directed, visionary maker culture.", strategy: "My heart is in the work. Specific interdisciplinary focus.", evidence: ["SCS #1", "Tartan Soul"] },
             { id: "gatech", name: "Georgia Tech", rank: 33, code: "AKDV-MR", persona: "The Public Engineer", desc: "Intense Applied focus, Kinship through rigor, Metro (Atlanta).", strategy: "Show grit and engineering prowess.", evidence: ["Helluva Engineer", "Atlanta Hub"] },
 
-            // CHICAGO STYLE
+            // CHICAGO STYLE (5)
             { id: "uchicago", name: "UChicago", rank: 6, code: "CSDE-MR", persona: "The Theory Fortress", desc: "Conceptual, solo/debate-heavy, directed (Core), established prestige.", strategy: "Life of the Mind. Love the 'Why'.", evidence: ["The Core", "Scav Hunt"] },
             { id: "jhu", name: "Johns Hopkins", rank: 7, code: "ASDE-MR", persona: "The Research Specialist", desc: "Applied/Medical, solo/independent, directed, research dominant.", strategy: "Research capability. Applied science focus.", evidence: ["Research Spending #1", "Baltimore"] },
             { id: "northwestern", name: "Northwestern", rank: 10, code: "AKDE-MR", persona: "The Applied Communicator", desc: "Applied, kinship/social, directed (Schools), established but modern.", strategy: "The 'AND' DNA. Journalism + Engineering.", evidence: ["Quarter System", "The Rock"] },
             { id: "washu", name: "WashU St. Louis", rank: 24, code: "AKFE-MR", persona: "The Midwest Intellectual", desc: "Applied (Pre-med), high Kinship, Fluid, Research powerhouse.", strategy: "Be nice. High achievement with kindness.", evidence: ["Pre-Med Support", "Residential Life"] },
             { id: "georgetown", name: "Georgetown", rank: 24, code: "ASDE-MU", persona: "The Global Diplomat", desc: "Applied (Policy), Solo (City), Directed, Established. Undergrad focus.", strategy: "Cura Personalis. Service to the world.", evidence: ["SFS", "Jesuit Values"] },
 
-             // SOUTHERN & OTHERS
+             // SOUTHERN & OTHERS (6)
             { id: "duke", name: "Duke University", rank: 10, code: "AKDE-GR", persona: "The Spirited Leader", desc: "Applied/Active, kinship (school spirit), directed, traditional bubble.", strategy: "Work hard play hard. Interdisciplinary.", evidence: ["Cameron Crazies", "Bass Connections"] },
             { id: "vanderbilt", name: "Vanderbilt", rank: 18, code: "AKFE-MR", persona: "The Happy Balanced", desc: "Applied, kinship (happiest students), fluid/social, metro-integrated.", strategy: "Balance. Happiness. The Commons.", evidence: ["The Commons", "Nashville"] },
             { id: "rice", name: "Rice University", rank: 17, code: "AKFV-MR", persona: "The Unconventional Village", desc: "Applied, intense kinship (Colleges), fluid, visionary/quirky.", strategy: "Culture of Care. Residential College loyalty.", evidence: ["Residential Colleges", "Unconventional Wisdom"] },
@@ -340,7 +349,7 @@
             { id: "notredame", name: "Notre Dame", rank: 20, code: "CKDE-GU", persona: "The Faithful Steward", desc: "Conceptual (Values), intense Kinship, Directed, Established. A true 'Grove'.", strategy: "A force for good. Values-based leadership.", evidence: ["Dorm Life", "Catholic Mission"] },
             { id: "unc", name: "UNC Chapel Hill", rank: 27, code: "AKDE-GR", persona: "The Public Leader", desc: "Applied, Kinship (Tar Heels), Directed, Established. The classic 'Grove'.", strategy: "The Carolina Way. Public service.", evidence: ["Public Ivy", "College Town"] },
             
-            // PUBLIC POWERHOUSES
+            // PUBLIC POWERHOUSES (8)
             { id: "berkeley", name: "UC Berkeley", rank: 15, code: "ASFV-MR", persona: "The Radical Giant", desc: "Applied/Activist, solo (sink or swim), fluid options, visionary/political.", strategy: "Scale and Grit. Self-starter.", evidence: ["Activism", "Scale"] },
             { id: "ucla", name: "UCLA", rank: 15, code: "AKFE-MR", persona: "The Optimistic Creative", desc: "Applied, kinship (happier vibe than Cal), fluid, metro.", strategy: "Optimism and Impact. Creative capital.", evidence: ["Applications #1", "Hollywood connection"] },
             { id: "usc", name: "USC", rank: 28, code: "AKDV-MR", persona: "The Networked Titan", desc: "Applied (Cinema/Biz), Kinship (Trojan Family), Directed, Visionary.", strategy: "Trojan Family network. Renaissance Scholar.", evidence: ["Trojan Family", "Renaissance Scholars"] },
@@ -350,13 +359,26 @@
             { id: "umich", name: "UMich", rank: 21, code: "AKDE-GR", persona: "The Massive Victor", desc: "Applied, kinship (spirit), directed, grove/research hybrid.", strategy: "Leaders and Best. Massive scale.", evidence: ["The Victors", "Ann Arbor"] },
             { id: "uf", name: "Univ of Florida", rank: 30, code: "AKDE-GR", persona: "The Southern Giant", desc: "Applied, Kinship (Gators), Directed, Established/Grove.", strategy: "Gator Nation. Top 5 Public.", evidence: ["Gator Nation", "Research"] },
 
-            // URBAN HUSTLERS & OTHERS
+            // URBAN HUSTLERS & OTHERS (19)
             { id: "nyu", name: "NYU", rank: 30, code: "ASFV-MR", persona: "The Global Citizen", desc: "Applied, Solo, Fluid (City is the campus), Visionary.", strategy: "In and of the City. Hustle.", evidence: ["No Campus", "Global Network"] },
             { id: "bu", name: "Boston University", rank: 41, code: "ASDE-MR", persona: "The City Professional", desc: "Applied, Solo, Directed, Established.", strategy: "Professional preparation in the city.", evidence: ["Commonwealth Ave", "Research"] },
             { id: "northeastern", name: "Northeastern", rank: 53, code: "ASDV-MR", persona: "The Co-op Captain", desc: "Applied, Solo (Rotational), Directed, Visionary (New model).", strategy: "Co-op. Experience over theory.", evidence: ["Co-op Program", "Global Campuses"] },
             { id: "tufts", name: "Tufts University", rank: 37, code: "CKFV-MU", persona: "The Civic Thinker", desc: "Conceptual (IR), Kinship (Jumbos), Fluid, Visionary, Metro-adjacent.", strategy: "Active Citizenship. International focus.", evidence: ["Tisch College", "Jumbo"] },
             { id: "bc", name: "Boston College", rank: 37, code: "CKDE-MU", persona: "The Jesuit Scholar", desc: "Conceptual, Kinship, Directed (Core), Established.", strategy: "Men and women for others. Jesuit.", evidence: ["Jesuit Core", "Service"] },
             { id: "rochester", name: "Univ of Rochester", rank: 44, code: "CKFV-GU", persona: "The Open Scientist", desc: "Conceptual, Kinship, Fluid (Open Curriculum), Visionary.", strategy: "Build your own curriculum. Meliora.", evidence: ["Open Curriculum", "Meliora"] },
+            { id: "ucdavis", name: "UC Davis", rank: 33, code: "BKDE-SR", persona: "The Friendly Giant", desc: "Balanced, Kinship, Directed, Service-oriented Research.", strategy: "Collaborative, sustainable, grounded.", evidence: ["Aggie Pride", "Ag/Vet Elite"] },
+            { id: "ucirvine", name: "UC Irvine", rank: 33, code: "BADS-IR", persona: "The Modern Researcher", desc: "Balanced, Atomized, Directed, Intellectual Research.", strategy: "Serious academics, gaming/tech focus.", evidence: ["Esports", "Anteaters"] },
+            { id: "uiuc", name: "UIUC", rank: 33, code: "AADE-VR", persona: "The Prairie Innovator", desc: "Applied (Eng), Atomized, Directed, Vitality Research.", strategy: "Grainger Engineering excellence.", evidence: ["Research Park", "Greek Life"] },
+            { id: "uwmadison", name: "UW Madison", rank: 39, code: "BKDH-VR", persona: "The Badger Spirit", desc: "Balanced, Kinship, Directed, Hybrid Vitality.", strategy: "Work hard play hard on the Isthmus.", evidence: ["The Isthmus", "Badger Pride"] },
+            { id: "ucsb", name: "UCSB", rank: 39, code: "BKDG-VR", persona: "The Coastal Scholar", desc: "Balanced, Kinship, Directed, Grove Vitality.", strategy: "Nobel laureates on the beach.", evidence: ["Isla Vista", "Physics"] },
+            { id: "osu", name: "Ohio State", rank: 41, code: "AKDM-VR", persona: "The Buckeye Force", desc: "Applied, Kinship, Directed, Metro Vitality.", strategy: "Massive scale and spirit.", evidence: ["The Horseshoe", "Research"] },
+            { id: "rutgers", name: "Rutgers", rank: 41, code: "BADS-VR", persona: "The State Engine", desc: "Balanced, Atomized, Directed, Suburban Vitality.", strategy: "Diverse, gritty, research-heavy.", evidence: ["New Brunswick", "Big Ten"] },
+            { id: "umd", name: "UMD College Park", rank: 46, code: "AKDS-VR", persona: "The Capital Tech", desc: "Applied, Kinship, Directed, Suburban Vitality.", strategy: "CS/Cyber excellence near DC.", evidence: ["Terps", "DC Proximity"] },
+            { id: "uwseattle", name: "UW Seattle", rank: 46, code: "AADM-IR", persona: "The Pacific Titan", desc: "Applied, Atomized, Directed, Metro Intellectual.", strategy: "CS/Med dominance in Seattle.", evidence: ["Udubb", "Microsoft/Amazon"] },
+            { id: "lehigh", name: "Lehigh", rank: 46, code: "ASDE-VU", persona: "The Mountain Engineer", desc: "Applied, Stratified, Directed, Enclave Vitality.", strategy: "Work hard play hard on the hill.", evidence: ["The Hill", "Greek Life"] },
+            { id: "purdue", name: "Purdue", rank: 46, code: "AKSE-VR", persona: "The Cradle of Astronauts", desc: "Applied, Kinship, Structured, Enclave Vitality.", strategy: "Grit and Engineering.", evidence: ["Boilermakers", "Space History"] },
+            { id: "uga", name: "UGA", rank: 46, code: "BKDE-VR", persona: "The Classic Bulldog", desc: "Balanced, Kinship, Directed, Enclave Vitality.", strategy: "Athens college town experience.", evidence: ["SEC Football", "Athens"] },
+            { id: "tamu", name: "Texas A&M", rank: 51, code: "AKSE-SR", persona: "The Aggie Cult", desc: "Applied, Kinship, Structured, Enclave Service.", strategy: "Deepest kinship in the nation.", evidence: ["12th Man", "Corps of Cadets"] }
         ];
 
         // --- GLOBAL STATE ---
@@ -364,7 +386,6 @@
         let quizResults = { M: 0, S: 0, P: 0, Sp: 0, E: 0, F: 0 };
         let comparisonList = [null, null];
         let currentQIndex = 0;
-        let selectedSide = null; // 'left' or 'right'
 
         // --- THE FULL 72-QUESTION ENGINE ---
         const OAD72 = [
@@ -605,7 +626,7 @@
             });
         }
 
-        // --- QUIZ LOGIC (72 QUESTIONS - FORCED CHOICE) ---
+        // --- QUIZ LOGIC (72 QUESTIONS - 1 CLICK) ---
         function startQuiz() {
             currentQIndex = 0;
             quizResults = { M: 0, S: 0, P: 0, Sp: 0, E: 0, F: 0 };
@@ -623,14 +644,6 @@
         function renderQuestion() {
             const q = OAD72[currentQIndex];
             document.getElementById('quiz-step').innerText = currentQIndex + 1;
-            
-            // Reset Interaction State
-            selectedSide = null;
-            document.getElementById('intensity-selector').classList.add('hidden');
-            document.getElementById('card-left').classList.remove('selected', 'opacity-50', 'scale-95');
-            document.getElementById('card-right').classList.remove('selected', 'opacity-50', 'scale-95');
-            document.getElementById('card-left').classList.add('bg-white');
-            document.getElementById('card-right').classList.add('bg-white');
 
             // Section Titles
             let sectionTitle = "";
@@ -647,48 +660,6 @@
             // Display Choices
             document.getElementById('opt-1-text').innerText = q.left;
             document.getElementById('opt-2-text').innerText = q.right;
-        }
-
-        // New Interaction Logic: Select Side -> Show Intensity
-        function selectSide(side) {
-            selectedSide = side;
-            const leftCard = document.getElementById('card-left');
-            const rightCard = document.getElementById('card-right');
-            
-            if(side === 'left') {
-                leftCard.classList.add('selected');
-                leftCard.classList.remove('bg-white');
-                rightCard.classList.remove('selected');
-                rightCard.classList.add('bg-white', 'opacity-50', 'scale-95');
-            } else {
-                rightCard.classList.add('selected');
-                rightCard.classList.remove('bg-white');
-                leftCard.classList.remove('selected');
-                leftCard.classList.add('bg-white', 'opacity-50', 'scale-95');
-            }
-            
-            // Reveal Intensity Buttons
-            document.getElementById('intensity-selector').classList.remove('hidden');
-        }
-
-        function confirmAnswer(intensity) {
-            // Intensity input is 5 (Strong), 4 (Lean), 3 (Neutral)
-            // If selectedSide is 'left' (Option A), math is:
-            //   Strongly A = 1
-            //   Lean A = 2
-            // If selectedSide is 'right' (Option B), math is:
-            //   Lean B = 4
-            //   Strongly B = 5
-            
-            let finalScore = 3;
-            if(intensity === 3) finalScore = 3;
-            else if(selectedSide === 'left') {
-                finalScore = intensity === 5 ? 1 : 2;
-            } else if(selectedSide === 'right') {
-                finalScore = intensity === 5 ? 5 : 4;
-            }
-
-            handleAnswer(finalScore);
         }
 
         function handleAnswer(score) {
