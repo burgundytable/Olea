@@ -56,6 +56,11 @@
         
         /* Filter Button Active State */
         .filter-btn.active { @apply bg-olea-primary text-white border-olea-primary; }
+
+        /* Choice Card Styles */
+        .choice-card { transition: all 0.2s ease-in-out; }
+        .choice-card:hover { transform: scale(1.02); border-color: #123d07; }
+        .choice-card.selected { background-color: #123d07; color: #f9f5ef; border-color: #123d07; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-olea-primary selection:text-white">
@@ -86,7 +91,7 @@
         <div class="container mx-auto px-6 max-w-6xl text-center">
             <h2 class="text-3xl md:text-5xl font-display font-bold text-olea-primary mb-4">Cultivating Eunoia</h2>
             <p class="text-lg text-stone-600 font-light max-w-2xl mx-auto mb-8">
-                The <strong>Olea Archetype System™</strong> decodes the "Institutional DNA" of top universities. 
+                The <strong>Olea Archetype System™</strong> decodes the "Institutional DNA" of the Top 50 universities. 
                 Complete the full 72-point calibration to calculate the precise distance between your profile and your target school.
             </p>
 
@@ -95,7 +100,7 @@
                     <i class="fas fa-fingerprint"></i> Full DNA Calibration (72)
                 </button>
                 <button onclick="document.getElementById('directory-section').scrollIntoView({behavior:'smooth'})" class="bg-white text-olea-primary border border-olea-primary/20 px-8 py-3 rounded-lg font-display font-bold shadow-sm hover:bg-olea-light transition duration-300">
-                    Browse Directory
+                    Browse Directory (50)
                 </button>
             </div>
         </div>
@@ -168,8 +173,6 @@
                 <!-- DNA Visualization -->
                 <div class="space-y-4 mb-8">
                     <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-100 pb-2">Genetic Profile</h3>
-                    
-                    <!-- DNA Sliders (Generated via JS) -->
                     <div id="modal-dna-visuals" class="space-y-3"></div>
                 </div>
 
@@ -216,9 +219,9 @@
 
     <!-- MODAL: Diagnostic Quiz -->
     <div id="quiz-modal" class="fixed inset-0 bg-olea-primary/95 hidden z-[70] flex flex-col items-center justify-center p-4">
-        <div class="w-full max-w-2xl">
+        <div class="w-full max-w-4xl h-full md:h-auto">
             <!-- Header -->
-            <div class="flex justify-between items-end mb-6 text-olea-base">
+            <div class="flex justify-between items-end mb-6 text-olea-base px-4">
                 <div>
                     <h2 class="text-2xl md:text-3xl font-display font-bold">DNA Calibration</h2>
                     <p id="quiz-section-title" class="text-olea-accent text-sm font-bold mt-1 uppercase tracking-widest">Part I: The Mind</p>
@@ -230,33 +233,40 @@
             </div>
 
             <!-- Card -->
-            <div id="quiz-card" class="bg-olea-base rounded-2xl shadow-2xl p-6 md:p-10 relative overflow-hidden h-[500px] flex flex-col">
-                <button onclick="closeQuiz()" class="absolute top-4 right-4 text-stone-300 hover:text-olea-primary"><i class="fas fa-times"></i></button>
+            <div id="quiz-card" class="bg-olea-base rounded-2xl shadow-2xl p-6 md:p-10 relative overflow-hidden min-h-[500px] flex flex-col justify-center">
+                <button onclick="closeQuiz()" class="absolute top-4 right-4 text-stone-300 hover:text-olea-primary z-10"><i class="fas fa-times"></i></button>
                 
-                <div id="quiz-question-container" class="fade-in flex-grow flex flex-col justify-center">
-                    <p id="quiz-text" class="text-lg md:text-2xl font-display font-bold text-olea-primary mb-6 leading-snug text-center">
-                        Question Text
+                <div id="quiz-question-container" class="fade-in">
+                    <p id="quiz-text" class="text-lg md:text-xl font-medium text-stone-500 mb-8 text-center italic">
+                        Select the statement that resonates most with you.
                     </p>
 
-                    <div class="space-y-3">
-                        <!-- Option 1 (Left Strong) -->
-                        <button onclick="handleAnswer(1)" class="w-full text-left p-4 rounded-xl border border-stone-200 hover:border-olea-primary hover:bg-white transition group flex items-center justify-between">
-                            <span id="opt-1-text" class="text-stone-700 font-medium group-hover:text-olea-primary text-sm md:text-base">Option A</span>
-                            <div class="w-4 h-4 rounded-full border border-stone-300 group-hover:bg-olea-primary ml-4 shrink-0"></div>
-                        </button>
-                        
-                        <!-- Spectrum Middle -->
-                        <div class="flex justify-center gap-2 my-2">
-                             <button onclick="handleAnswer(2)" class="w-8 h-8 rounded-full border border-stone-200 text-stone-400 text-xs hover:bg-olea-primary hover:text-white transition">2</button>
-                             <button onclick="handleAnswer(3)" class="w-8 h-8 rounded-full border border-stone-200 text-stone-300 text-xs hover:bg-olea-secondary hover:text-white transition" title="Neutral (Avoid if possible)">3</button>
-                             <button onclick="handleAnswer(4)" class="w-8 h-8 rounded-full border border-stone-200 text-stone-400 text-xs hover:bg-olea-primary hover:text-white transition">4</button>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <!-- Option A Card -->
+                        <div onclick="selectSide('left')" id="card-left" class="choice-card bg-white p-6 rounded-xl border-2 border-stone-200 cursor-pointer flex flex-col justify-center items-center text-center h-48 group">
+                            <div class="w-8 h-8 rounded-full border-2 border-stone-300 mb-4 group-hover:bg-olea-primary group-hover:border-olea-primary transition-colors"></div>
+                            <span id="opt-1-text" class="text-lg font-display font-bold text-stone-700 group-hover:text-olea-primary">Option A Text</span>
                         </div>
 
-                        <!-- Option 5 (Right Strong) -->
-                        <button onclick="handleAnswer(5)" class="w-full text-right p-4 rounded-xl border border-stone-200 hover:border-olea-primary hover:bg-white transition group flex items-center justify-between flex-row-reverse">
-                            <span id="opt-2-text" class="text-stone-700 font-medium group-hover:text-olea-primary text-sm md:text-base">Option B</span>
-                            <div class="w-4 h-4 rounded-full border border-stone-300 group-hover:bg-olea-primary mr-4 shrink-0"></div>
-                        </button>
+                        <!-- Option B Card -->
+                        <div onclick="selectSide('right')" id="card-right" class="choice-card bg-white p-6 rounded-xl border-2 border-stone-200 cursor-pointer flex flex-col justify-center items-center text-center h-48 group">
+                            <div class="w-8 h-8 rounded-full border-2 border-stone-300 mb-4 group-hover:bg-olea-primary group-hover:border-olea-primary transition-colors"></div>
+                            <span id="opt-2-text" class="text-lg font-display font-bold text-stone-700 group-hover:text-olea-primary">Option B Text</span>
+                        </div>
+                    </div>
+
+                    <!-- Intensity Selector (Hidden until side selected) -->
+                    <div id="intensity-selector" class="hidden text-center fade-in">
+                        <p class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-4">How strongly?</p>
+                        <div class="flex justify-center gap-4">
+                            <button onclick="confirmAnswer(5)" class="px-6 py-3 bg-olea-primary text-white rounded-lg font-bold hover:bg-olea-hover transition shadow-md w-32">Strongly</button>
+                            <button onclick="confirmAnswer(4)" class="px-6 py-3 bg-white text-olea-primary border border-olea-primary rounded-lg font-bold hover:bg-olea-light transition shadow-sm w-32">Leaning</button>
+                            <!-- Neutral option kept hidden/small to discourage use unless specifically needed by user logic, 
+                                 but available if we want to implement a strict 5-pt scale. 
+                                 For now, forcing 4 or 5 aligns with "Forced Choice". 
+                                 Adding a small "Neutral" link below. -->
+                        </div>
+                        <button onclick="confirmAnswer(3)" class="text-xs text-stone-400 hover:text-stone-600 underline mt-4">I am genuinely split (Neutral)</button>
                     </div>
                 </div>
 
@@ -296,101 +306,57 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // --- DATA: THE INSTITUTIONAL DNA ---
+        // --- DATA: THE INSTITUTIONAL DNA (Top 50) ---
         const universities = [
             // IVY LEAGUE
-            { id: "princeton", name: "Princeton University", rank: 1, code: "CKFE-GU", persona: "The Conceptual Village", 
-              desc: "Theoretical, tight-knit, open path, traditional. The ultimate 'Undergrad Grove'.",
-              strategy: "Emphasize pure theory and the Senior Thesis. Avoid pre-professional talk.", 
-              evidence: ["Senior Thesis Mandatory", "Eating Clubs", "No Med/Law/Biz Schools"] },
-            { id: "harvard", name: "Harvard University", rank: 3, code: "ASFE-MR", persona: "The Applied Star", 
-              desc: "Action-oriented, independent, flexible path, prestigious. A massive 'Research Metro'.",
-              strategy: "Show massive scale of impact. You must be a 'Solo' leader who doesn't need hand-holding.", 
-              evidence: ["Extension School", "Massive Endowment", "Cambridge City Integration"] },
-            { id: "yale", name: "Yale University", rank: 5, code: "CKFE-GU", persona: "The Humanist Village", 
-              desc: "Similar to Princeton but slightly more socially fluid. Traditional but supportive.",
-              strategy: "Highlight 'Kinship' and the Residential Colleges. Be a humanist scholar.", 
-              evidence: ["Residential Colleges", "Global Strategy", "Arts Focus"] },
-            { id: "columbia", name: "Columbia University", rank: 12, code: "CSDE-MR", persona: "The Directed Intellectual", 
-              desc: "Deeply theoretical (Core), solo/independent, very structured. NYC intensity.",
-              strategy: "You must love the Core Curriculum (Western Canon) and the grit of NYC.", 
-              evidence: ["The Core Curriculum", "NYC Location", "Butler Library Culture"] },
-            { id: "penn", name: "UPenn", rank: 7, code: "ASDE-MR", persona: "The Pragmatic Operator", 
-              desc: "Applied/Pre-professional, competitive, structured (Schools), traditional prestige.",
-              strategy: "Connect theory to practice immediately. 'What is this knowledge FOR?'", 
-              evidence: ["Wharton Influence", "One University Policy", "Pre-Professional Vibe"] },
-            { id: "brown", name: "Brown University", rank: 13, code: "CKFV-GU", persona: "The Happy Architect", 
-              desc: "Conceptual but creative, highly collaborative, the most fluid path, slightly visionary.",
-              strategy: "Demonstrate ability to handle the Open Curriculum. Be 'Kinship' oriented.", 
-              evidence: ["Open Curriculum", "S/NC Grading", "Happy Ivy"] },
-            { id: "dartmouth", name: "Dartmouth College", rank: 12, code: "AKDE-GU", persona: "The Loyal Captain", 
-              desc: "Applied/Active, intense kinship, somewhat directed (D-Plan), very traditional.",
-              strategy: "Focus on the 'Grove' (Nature) and the D-Plan flexibility.", 
-              evidence: ["D-Plan", "Hanover/Outdoors", "Greek Life Dominance"] },
-            { id: "cornell", name: "Cornell University", rank: 17, code: "ASDE-GR", persona: "The Vocational Giant", 
-              desc: "Applied, independent, structured (Colleges), traditional but research-heavy in a rural setting.",
-              strategy: "Fit to Major/College is critical. Be 'Applied' and vocational.", 
-              evidence: ["Distinct Colleges (Hotel, Ag)", "Gorges/Ithaca", "Any Person Any Study"] },
+            { id: "princeton", name: "Princeton University", rank: 1, code: "CKFE-GU", persona: "The Conceptual Village", desc: "Theoretical, tight-knit, open path, traditional. The ultimate 'Undergrad Grove'.", strategy: "Emphasize pure theory and the Senior Thesis.", evidence: ["Senior Thesis Mandatory", "Eating Clubs"] },
+            { id: "harvard", name: "Harvard University", rank: 3, code: "ASFE-MR", persona: "The Applied Star", desc: "Action-oriented, independent, flexible path. A massive 'Research Metro'.", strategy: "Show massive scale of impact and solo leadership.", evidence: ["Extension School", "Massive Endowment"] },
+            { id: "yale", name: "Yale University", rank: 5, code: "CKFE-GU", persona: "The Humanist Village", desc: "Similar to Princeton but slightly more socially fluid. Traditional but supportive.", strategy: "Highlight 'Kinship' and the Residential Colleges.", evidence: ["Residential Colleges", "Global Strategy"] },
+            { id: "columbia", name: "Columbia University", rank: 12, code: "CSDE-MR", persona: "The Directed Intellectual", desc: "Deeply theoretical (Core), solo/independent, very structured. NYC intensity.", strategy: "You must love the Core Curriculum and NYC grit.", evidence: ["The Core Curriculum", "Butler Library"] },
+            { id: "penn", name: "UPenn", rank: 7, code: "ASDE-MR", persona: "The Pragmatic Operator", desc: "Applied/Pre-professional, competitive, structured. Traditional prestige.", strategy: "Connect theory to practice immediately.", evidence: ["Wharton Influence", "One University Policy"] },
+            { id: "brown", name: "Brown University", rank: 13, code: "CKFV-GU", persona: "The Happy Architect", desc: "Conceptual but creative, highly collaborative, fluid path, slightly visionary.", strategy: "Demonstrate ability to handle the Open Curriculum.", evidence: ["Open Curriculum", "S/NC Grading"] },
+            { id: "dartmouth", name: "Dartmouth College", rank: 12, code: "AKDE-GU", persona: "The Loyal Captain", desc: "Applied/Active, intense kinship, directed (D-Plan), very traditional.", strategy: "Focus on the 'Grove' (Nature) and the D-Plan.", evidence: ["D-Plan", "Greek Life Dominance"] },
+            { id: "cornell", name: "Cornell University", rank: 17, code: "ASDE-GR", persona: "The Vocational Giant", desc: "Applied, independent, structured (Colleges), traditional research-heavy.", strategy: "Fit to Major/College is critical.", evidence: ["Distinct Colleges", "Any Person Any Study"] },
 
             // TECH & INNOVATION
-            { id: "mit", name: "MIT", rank: 2, code: "AKDV-MR", persona: "The Collaborative Hacker", 
-              desc: "Applied, surprisingly collaborative (Kinship via suffering), structured, visionary.",
-              strategy: "Mens et Manus. Show you build things with others.", 
-              evidence: ["Hacks", "P-Sets", "Mens et Manus"] },
-            { id: "stanford", name: "Stanford University", rank: 3, code: "ASFV-GR", persona: "The Visionary Star", 
-              desc: "Applied/Entrepreneurial, independent, fluid path. The ultimate visionary status.",
-              strategy: "Intellectual Vitality + Innovation. Be 'Duck Syndrome' calm but elite.", 
-              evidence: ["Silicon Valley", "D-School", "Start-up Culture"] },
-            { id: "caltech", name: "Caltech", rank: 9, code: "CSDV-GR", persona: "The Pure Scientist", 
-              desc: "Conceptual/Theory-heavy, solo/intense, highly directed, visionary science focus.",
-              strategy: "Pure 'Conceptual' rigor. Honor code. No fluff.", 
-              evidence: ["Honor Code", "House System", "Core Science"] },
-            { id: "cmu", name: "Carnegie Mellon", rank: 22, code: "AKDV-MR", persona: "The Interdisciplinary Specialist", 
-              desc: "Applied, kinship (within majors), directed, visionary maker culture.",
-              strategy: "My heart is in the work. Specific interdisciplinary focus.", 
-              evidence: ["SCS #1", "Drama/Arts", "Tartan Soul"] },
+            { id: "mit", name: "MIT", rank: 2, code: "AKDV-MR", persona: "The Collaborative Hacker", desc: "Applied, collaborative (Kinship via suffering), structured, visionary.", strategy: "Mens et Manus. Show you build things with others.", evidence: ["Hacks", "Mens et Manus"] },
+            { id: "stanford", name: "Stanford University", rank: 3, code: "ASFV-GR", persona: "The Visionary Star", desc: "Applied/Entrepreneurial, independent, fluid path. Visionary status.", strategy: "Intellectual Vitality + Innovation.", evidence: ["Silicon Valley", "D-School"] },
+            { id: "caltech", name: "Caltech", rank: 9, code: "CSDV-GR", persona: "The Pure Scientist", desc: "Conceptual/Theory-heavy, solo/intense, highly directed, visionary science.", strategy: "Pure 'Conceptual' rigor. Honor code.", evidence: ["Honor Code", "House System"] },
+            { id: "cmu", name: "Carnegie Mellon", rank: 22, code: "AKDV-MR", persona: "The Interdisciplinary Specialist", desc: "Applied, kinship (within majors), directed, visionary maker culture.", strategy: "My heart is in the work. Specific interdisciplinary focus.", evidence: ["SCS #1", "Tartan Soul"] },
+            { id: "gatech", name: "Georgia Tech", rank: 33, code: "AKDV-MR", persona: "The Public Engineer", desc: "Intense Applied focus, Kinship through rigor, Metro (Atlanta).", strategy: "Show grit and engineering prowess.", evidence: ["Helluva Engineer", "Atlanta Hub"] },
 
             // CHICAGO STYLE
-            { id: "uchicago", name: "UChicago", rank: 6, code: "CSDE-MR", persona: "The Theory Fortress", 
-              desc: "Conceptual, solo/debate-heavy, directed (Core), established prestige.",
-              strategy: "Life of the Mind. Love the 'Why'. Weird essays.", 
-              evidence: ["The Core", "Where Fun Comes to Die (Old)", "Scav Hunt"] },
-            { id: "jhu", name: "Johns Hopkins", rank: 7, code: "ASDE-MR", persona: "The Research Specialist", 
-              desc: "Applied/Medical, solo/independent, directed, research dominant.",
-              strategy: "Research capability. Applied science focus.", 
-              evidence: ["Research Spending #1", "Pre-Med Intensity", "Baltimore"] },
-            { id: "northwestern", name: "Northwestern", rank: 10, code: "AKDE-MR", persona: "The Applied Communicator", 
-              desc: "Applied, kinship/social, directed (Schools), established but modern.",
-              strategy: "The 'AND' DNA. Journalism + Engineering. Communication is key.", 
-              evidence: ["Quarter System", "Medill", "The Rock"] },
-            
+            { id: "uchicago", name: "UChicago", rank: 6, code: "CSDE-MR", persona: "The Theory Fortress", desc: "Conceptual, solo/debate-heavy, directed (Core), established prestige.", strategy: "Life of the Mind. Love the 'Why'.", evidence: ["The Core", "Scav Hunt"] },
+            { id: "jhu", name: "Johns Hopkins", rank: 7, code: "ASDE-MR", persona: "The Research Specialist", desc: "Applied/Medical, solo/independent, directed, research dominant.", strategy: "Research capability. Applied science focus.", evidence: ["Research Spending #1", "Baltimore"] },
+            { id: "northwestern", name: "Northwestern", rank: 10, code: "AKDE-MR", persona: "The Applied Communicator", desc: "Applied, kinship/social, directed (Schools), established but modern.", strategy: "The 'AND' DNA. Journalism + Engineering.", evidence: ["Quarter System", "The Rock"] },
+            { id: "washu", name: "WashU St. Louis", rank: 24, code: "AKFE-MR", persona: "The Midwest Intellectual", desc: "Applied (Pre-med), high Kinship, Fluid, Research powerhouse.", strategy: "Be nice. High achievement with kindness.", evidence: ["Pre-Med Support", "Residential Life"] },
+            { id: "georgetown", name: "Georgetown", rank: 24, code: "ASDE-MU", persona: "The Global Diplomat", desc: "Applied (Policy), Solo (City), Directed, Established. Undergrad focus.", strategy: "Cura Personalis. Service to the world.", evidence: ["SFS", "Jesuit Values"] },
+
              // SOUTHERN & OTHERS
-            { id: "duke", name: "Duke University", rank: 10, code: "AKDE-GR", persona: "The Spirited Leader", 
-              desc: "Applied/Active, kinship (school spirit), directed, traditional campus bubble.",
-              strategy: "Work hard play hard. Interdisciplinary 'Bass Connections'.", 
-              evidence: ["Cameron Crazies", "Bass Connections", "Gothic Wonderland"] },
-            { id: "vanderbilt", name: "Vanderbilt", rank: 13, code: "AKFE-MR", persona: "The Happy Balanced", 
-              desc: "Applied, kinship (happiest students), fluid/social, metro-integrated.",
-              strategy: "Balance. Happiness. The Commons living experience.", 
-              evidence: ["The Commons", "Nashville", "Happiest Students"] },
-            { id: "rice", name: "Rice University", rank: 15, code: "AKFV-MR", persona: "The Unconventional Village", 
-              desc: "Applied, intense kinship (Colleges), fluid, visionary/quirky.",
-              strategy: "Culture of Care. Residential College loyalty.", 
-              evidence: ["Residential Colleges", "Unconventional Wisdom", "Houston"] },
-            { id: "notredame", name: "Notre Dame", rank: 18, code: "CKDE-GU", persona: "The Faithful Steward", 
-              desc: "Conceptual (Values), intense Kinship, Directed, Established. A true 'Grove'.",
-              strategy: "A force for good. Values-based leadership.", 
-              evidence: ["Dorm Life", "Fighting Irish", "Catholic Mission"] },
+            { id: "duke", name: "Duke University", rank: 10, code: "AKDE-GR", persona: "The Spirited Leader", desc: "Applied/Active, kinship (school spirit), directed, traditional bubble.", strategy: "Work hard play hard. Interdisciplinary.", evidence: ["Cameron Crazies", "Bass Connections"] },
+            { id: "vanderbilt", name: "Vanderbilt", rank: 18, code: "AKFE-MR", persona: "The Happy Balanced", desc: "Applied, kinship (happiest students), fluid/social, metro-integrated.", strategy: "Balance. Happiness. The Commons.", evidence: ["The Commons", "Nashville"] },
+            { id: "rice", name: "Rice University", rank: 17, code: "AKFV-MR", persona: "The Unconventional Village", desc: "Applied, intense kinship (Colleges), fluid, visionary/quirky.", strategy: "Culture of Care. Residential College loyalty.", evidence: ["Residential Colleges", "Unconventional Wisdom"] },
+            { id: "emory", name: "Emory University", rank: 24, code: "CKFE-MR", persona: "The Wise Heart", desc: "Conceptual/Liberal Arts, kinship, fluid, metro (Atlanta).", strategy: "Public health and liberal arts ethics.", evidence: ["CDC Proximity", "Dooley"] },
+            { id: "notredame", name: "Notre Dame", rank: 20, code: "CKDE-GU", persona: "The Faithful Steward", desc: "Conceptual (Values), intense Kinship, Directed, Established. A true 'Grove'.", strategy: "A force for good. Values-based leadership.", evidence: ["Dorm Life", "Catholic Mission"] },
+            { id: "unc", name: "UNC Chapel Hill", rank: 27, code: "AKDE-GR", persona: "The Public Leader", desc: "Applied, Kinship (Tar Heels), Directed, Established. The classic 'Grove'.", strategy: "The Carolina Way. Public service.", evidence: ["Public Ivy", "College Town"] },
             
             // PUBLIC POWERHOUSES
-            { id: "berkeley", name: "UC Berkeley", rank: 20, code: "ASFV-MR", persona: "The Radical Giant", 
-              desc: "Applied/Activist, solo (sink or swim), fluid options, visionary/political.",
-              strategy: "Scale and Grit. You must be a self-starter.", 
-              evidence: ["Activism", "Scale", "Research Output"] },
-            { id: "ucla", name: "UCLA", rank: 20, code: "AKFE-MR", persona: "The Optimistic Creative", 
-              desc: "Applied, kinship (happier vibe than Cal), fluid, metro.",
-              strategy: "Optimism and Impact. Creative capital.", 
-              evidence: ["Applications #1", "Hollywood connection", "Bruin Spirit"] }
+            { id: "berkeley", name: "UC Berkeley", rank: 15, code: "ASFV-MR", persona: "The Radical Giant", desc: "Applied/Activist, solo (sink or swim), fluid options, visionary/political.", strategy: "Scale and Grit. Self-starter.", evidence: ["Activism", "Scale"] },
+            { id: "ucla", name: "UCLA", rank: 15, code: "AKFE-MR", persona: "The Optimistic Creative", desc: "Applied, kinship (happier vibe than Cal), fluid, metro.", strategy: "Optimism and Impact. Creative capital.", evidence: ["Applications #1", "Hollywood connection"] },
+            { id: "usc", name: "USC", rank: 28, code: "AKDV-MR", persona: "The Networked Titan", desc: "Applied (Cinema/Biz), Kinship (Trojan Family), Directed, Visionary.", strategy: "Trojan Family network. Renaissance Scholar.", evidence: ["Trojan Family", "Renaissance Scholars"] },
+            { id: "ucsd", name: "UCSD", rank: 28, code: "ASDV-MR", persona: "The Biotech Specialist", desc: "Applied, Solo (College system separates), Directed, Visionary.", strategy: "Research capability. Biotech focus.", evidence: ["Six Colleges", "La Jolla"] },
+            { id: "ut", name: "UT Austin", rank: 30, code: "ASDV-MR", persona: "The Innovation Hub", desc: "Applied, Solo (Size), Directed (Majors), Visionary (Austin Tech).", strategy: "Change the world. Keep Austin Weird.", evidence: ["Austin Tech", "Plan II"] },
+            { id: "uva", name: "UVA", rank: 24, code: "AKDE-GU", persona: "The Honor Steward", desc: "Applied/Leadership, kinship, directed traditions, grove environment.", strategy: "Student Self-Governance. Honor.", evidence: ["The Lawn", "Student Governance"] },
+            { id: "umich", name: "UMich", rank: 21, code: "AKDE-GR", persona: "The Massive Victor", desc: "Applied, kinship (spirit), directed, grove/research hybrid.", strategy: "Leaders and Best. Massive scale.", evidence: ["The Victors", "Ann Arbor"] },
+            { id: "uf", name: "Univ of Florida", rank: 30, code: "AKDE-GR", persona: "The Southern Giant", desc: "Applied, Kinship (Gators), Directed, Established/Grove.", strategy: "Gator Nation. Top 5 Public.", evidence: ["Gator Nation", "Research"] },
+
+            // URBAN HUSTLERS & OTHERS
+            { id: "nyu", name: "NYU", rank: 30, code: "ASFV-MR", persona: "The Global Citizen", desc: "Applied, Solo, Fluid (City is the campus), Visionary.", strategy: "In and of the City. Hustle.", evidence: ["No Campus", "Global Network"] },
+            { id: "bu", name: "Boston University", rank: 41, code: "ASDE-MR", persona: "The City Professional", desc: "Applied, Solo, Directed, Established.", strategy: "Professional preparation in the city.", evidence: ["Commonwealth Ave", "Research"] },
+            { id: "northeastern", name: "Northeastern", rank: 53, code: "ASDV-MR", persona: "The Co-op Captain", desc: "Applied, Solo (Rotational), Directed, Visionary (New model).", strategy: "Co-op. Experience over theory.", evidence: ["Co-op Program", "Global Campuses"] },
+            { id: "tufts", name: "Tufts University", rank: 37, code: "CKFV-MU", persona: "The Civic Thinker", desc: "Conceptual (IR), Kinship (Jumbos), Fluid, Visionary, Metro-adjacent.", strategy: "Active Citizenship. International focus.", evidence: ["Tisch College", "Jumbo"] },
+            { id: "bc", name: "Boston College", rank: 37, code: "CKDE-MU", persona: "The Jesuit Scholar", desc: "Conceptual, Kinship, Directed (Core), Established.", strategy: "Men and women for others. Jesuit.", evidence: ["Jesuit Core", "Service"] },
+            { id: "rochester", name: "Univ of Rochester", rank: 44, code: "CKFV-GU", persona: "The Open Scientist", desc: "Conceptual, Kinship, Fluid (Open Curriculum), Visionary.", strategy: "Build your own curriculum. Meliora.", evidence: ["Open Curriculum", "Meliora"] },
         ];
 
         // --- GLOBAL STATE ---
@@ -398,39 +364,40 @@
         let quizResults = { M: 0, S: 0, P: 0, Sp: 0, E: 0, F: 0 };
         let comparisonList = [null, null];
         let currentQIndex = 0;
+        let selectedSide = null; // 'left' or 'right'
 
         // --- THE FULL 72-QUESTION ENGINE ---
         const OAD72 = [
             // PART I: THE MIND (C vs A)
-            { dim: "M", text: "I want to understand the fundamental theory behind how the universe works.", left: "Agree Strong (Theory)", right: "Agree Strong (Application)" },
-            { dim: "M", text: "I prefer writing a 20-page thesis on history, philosophy, or literature.", left: "Agree Strong (Thesis)", right: "Agree Strong (Project/Code)" },
+            { dim: "M", text: "I want to understand the fundamental theory behind how the universe works.", left: "Understand Theory", right: "Build Solutions" },
+            { dim: "M", text: "I prefer writing a 20-page thesis on history, philosophy, or literature.", left: "Write Thesis", right: "Build Project" },
             { dim: "M", text: "My favorite classes are discussion-based seminars where we debate abstract ideas.", left: "Seminars", right: "Labs/Workshops" },
             { dim: "M", text: "I am motivated by curiosity: 'I just need to know the answer.'", left: "Curiosity", right: "Utility" },
             { dim: "M", text: "I would rather spend my summer reading in a library archive.", left: "Library", right: "Internship" },
-            { dim: "M", text: "I value 'Pure Mathematics' (proofs, logic, number theory).", left: "Pure Math", right: "Applied Math/Stats" },
-            { dim: "M", text: "I believe the purpose of college is 'intellectual formation' (shaping the soul).", left: "Formation", right: "Preparation/Jobs" },
+            { dim: "M", text: "I value 'Pure Mathematics' (proofs, logic, number theory).", left: "Pure Math", right: "Applied Math" },
+            { dim: "M", text: "I believe the purpose of college is 'intellectual formation' (shaping the soul).", left: "Formation", right: "Job Prep" },
             { dim: "M", text: "I often ask 'Why is this the way it is?'", left: "Ask Why", right: "Ask How" },
-            { dim: "M", text: "I admire the 'Philosopher' archetype (e.g., Plato, Kant).", left: "Philosopher", right: "Builder/Engineer" },
-            { dim: "M", text: "I enjoy dealing with ambiguity and questions that have no clear answer.", left: "Ambiguity", right: "Concrete Problems" },
-            { dim: "M", text: "If I ran a company, I would want to be the Chief Vision/Strategy Officer.", left: "Visionary", right: "Operations/Tech" },
-            { dim: "M", text: "In a zombie apocalypse, I am the one figuring out the cure.", left: "The Cure (Science)", right: "The Fortress (Build)" },
+            { dim: "M", text: "I admire the 'Philosopher' archetype (e.g., Plato, Kant).", left: "Philosopher", right: "Builder" },
+            { dim: "M", text: "I enjoy dealing with ambiguity and questions that have no clear answer.", left: "Ambiguity", right: "Concrete Answers" },
+            { dim: "M", text: "If I ran a company, I would want to be the Chief Vision/Strategy Officer.", left: "Visionary", right: "Operations" },
+            { dim: "M", text: "In a zombie apocalypse, I am the one figuring out the cure.", left: "Find Cure", right: "Build Fort" },
 
             // PART II: THE SOCIAL (S vs K)
             { dim: "S", text: "I work best when I am alone and have total control over the output.", left: "Solo Work", right: "Team Work" },
-            { dim: "S", text: "I am comfortable with 'sharp elbows' and intense competition to be #1.", left: "Competition", right: "Support/Collaboration" },
-            { dim: "S", text: "I view my peers primarily as competitors or benchmarks.", left: "Competitors", right: "Collaborators" },
+            { dim: "S", text: "I am comfortable with 'sharp elbows' and intense competition to be #1.", left: "Competition", right: "Collaboration" },
+            { dim: "S", text: "I view my peers primarily as competitors or benchmarks.", left: "Competitors", right: "Support Network" },
             { dim: "S", text: "I want to be recognized individually as a 'Star' in my field.", left: "Star", right: "Team Member" },
             { dim: "S", text: "I thrive in high-pressure environments where I sink or swim on my own merit.", left: "Sink or Swim", right: "High Trust" },
             { dim: "S", text: "I often feel held back by group projects; I'd rather just do it myself.", left: "Held Back", right: "Energized" },
             { dim: "S", text: "I respect leaders who are decisive, independent, and uncompromising.", left: "Decisive", right: "Empathetic" },
             { dim: "S", text: "A 'cutthroat' academic atmosphere excites me—it pushes me to be better.", left: "Excites Me", right: "Drains Me" },
-            { dim: "S", text: "I prioritize personal achievement and resume-building.", left: "Achievement", right: "Spirit/Bonding" },
+            { dim: "S", text: "I prioritize personal achievement and resume-building.", left: "Achievement", right: "Bonding" },
             { dim: "S", text: "I am okay being 'anonymous' in a big city as long as I am successful.", left: "Anonymous", right: "Known by Name" },
             { dim: "S", text: "I believe 'Iron sharpens iron' (Conflict creates growth).", left: "Conflict", right: "Support" },
             { dim: "S", text: "I want to be the Valedictorian (Top of the class).", left: "Valedictorian", right: "Class President" },
 
             // PART III: THE PATH (F vs D)
-            { dim: "P", text: "I hate required courses. Let me choose everything I study.", left: "Free Choice", right: "Roadmap/Reqs" },
+            { dim: "P", text: "I hate required courses. Let me choose everything I study.", left: "Free Choice", right: "Roadmap" },
             { dim: "P", text: "I want to explore disparate fields (e.g., Biology AND Poetry) equally.", left: "Explore", right: "Specialize" },
             { dim: "P", text: "I prefer an 'Open Curriculum' (Zero general education requirements).", left: "Open Curr", right: "Core Curr" },
             { dim: "P", text: "I thrive when I have to design my own major or path from scratch.", left: "Design Own", right: "Clear Tracks" },
@@ -452,10 +419,10 @@
             { dim: "Sp", text: "I am comfortable with hierarchy and paying my dues.", left: "Hierarchy", right: "Flat Structure" },
             { dim: "Sp", text: "I prefer stability and a guaranteed path to the top.", left: "Stability", right: "High Risk" },
             { dim: "Sp", text: "I resonate with the word 'Stewardship' (protecting what exists).", left: "Stewardship", right: "Disruption" },
-            { dim: "Sp", text: "I would feel proudest wearing a Harvard or Yale sweatshirt.", left: "HYP (Old)", right: "Stanford/MIT (New)" },
+            { dim: "Sp", text: "I would feel proudest wearing a Harvard or Yale sweatshirt.", left: "HYP (Old)", right: "Stanford/MIT" },
             { dim: "Sp", text: "I value networking with 'Old Money' and established power brokers.", left: "Old Money", right: "New Money" },
             { dim: "Sp", text: "I believe traditions bind a community together.", left: "Bind Together", right: "Hold Back" },
-            { dim: "Sp", text: "I want to be a Senator or a CEO of a Fortune 500.", left: "Senator/CEO", right: "Founder/Inventor" },
+            { dim: "Sp", text: "I want to be a Senator or a CEO of a Fortune 500.", left: "Senator/CEO", right: "Founder" },
 
             // PART V: THE ENVIRONMENT (M vs G)
             { dim: "E", text: "I want the city to be my campus. I don't need a 'quad.'", left: "City/No Quad", right: "Campus Bubble" },
@@ -467,9 +434,9 @@
             { dim: "E", text: "I don't care about football games or tailgating.", left: "Don't Care", right: "School Spirit" },
             { dim: "E", text: "I prefer 'commuter' style independence (apartment living).", left: "Apartment", right: "Dorm Life" },
             { dim: "E", text: "My dream Saturday is exploring a new neighborhood in the city.", left: "City Explore", right: "Campus Fest" },
-            { dim: "E", text: "I prefer a fast-paced environment with constant sensory stimulation.", left: "Fast/Stimulation", right: "Calm/Focus" }, // Added to reach 12
-            { dim: "E", text: "I want to see non-students (real people) every day.", left: "Real People", right: "Students Only" }, // Added
-            { dim: "E", text: "The idea of a 'College Town' feels claustrophobic to me.", left: "Claustrophobic", right: "Cozy" }, // Added
+            { dim: "E", text: "I prefer a fast-paced environment with constant sensory stimulation.", left: "Fast/Stimulation", right: "Calm/Focus" }, 
+            { dim: "E", text: "I want to see non-students (real people) every day.", left: "Real People", right: "Students Only" }, 
+            { dim: "E", text: "The idea of a 'College Town' feels claustrophobic to me.", left: "Claustrophobic", right: "Cozy" }, 
 
             // PART VI: THE FOCUS (R vs U)
             { dim: "F", text: "I want to attend a 'Research Powerhouse' with massive funding and labs.", left: "Research Power", right: "Student Centric" },
@@ -481,9 +448,9 @@
             { dim: "F", text: "I view professors as famous experts I can learn *from*.", left: "Experts", right: "Mentors" },
             { dim: "F", text: "I want resources, grants, and massive facilities above all else.", left: "Resources", right: "Care/Attention" },
             { dim: "F", text: "I'd rather be a small fish in a massive, prestigious ocean.", left: "Small Fish", right: "Big Fish" },
-            { dim: "F", text: "I care more about the library collection size than the dorm quality.", left: "Library/Labs", right: "Dorms/Food" }, // Added
-            { dim: "F", text: "I want to work with PhD students who are changing the field.", left: "PhD Peers", right: "Undergrad Peers" }, // Added
-            { dim: "F", text: "The university's global output matters more than my individual comfort.", left: "Output", right: "Comfort" } // Added
+            { dim: "F", text: "I care more about the library collection size than the dorm quality.", left: "Library/Labs", right: "Dorms/Food" }, 
+            { dim: "F", text: "I want to work with PhD students who are changing the field.", left: "PhD Peers", right: "Undergrad Peers" }, 
+            { dim: "F", text: "The university's global output matters more than my individual comfort.", left: "Output", right: "Comfort" } 
         ];
 
         // --- INITIALIZATION ---
@@ -638,7 +605,7 @@
             });
         }
 
-        // --- QUIZ LOGIC (72 QUESTIONS) ---
+        // --- QUIZ LOGIC (72 QUESTIONS - FORCED CHOICE) ---
         function startQuiz() {
             currentQIndex = 0;
             quizResults = { M: 0, S: 0, P: 0, Sp: 0, E: 0, F: 0 };
@@ -657,7 +624,15 @@
             const q = OAD72[currentQIndex];
             document.getElementById('quiz-step').innerText = currentQIndex + 1;
             
-            // Section Titles based on index (12 per section)
+            // Reset Interaction State
+            selectedSide = null;
+            document.getElementById('intensity-selector').classList.add('hidden');
+            document.getElementById('card-left').classList.remove('selected', 'opacity-50', 'scale-95');
+            document.getElementById('card-right').classList.remove('selected', 'opacity-50', 'scale-95');
+            document.getElementById('card-left').classList.add('bg-white');
+            document.getElementById('card-right').classList.add('bg-white');
+
+            // Section Titles
             let sectionTitle = "";
             if(currentQIndex < 12) sectionTitle = "Part I: The Mind (Conceptual vs Applied)";
             else if(currentQIndex < 24) sectionTitle = "Part II: The Social (Solo vs Kinship)";
@@ -669,9 +644,51 @@
             document.getElementById('quiz-section-title').innerText = sectionTitle;
             document.getElementById('quiz-text').innerText = q.text;
             
-            // In OAD72: Left = 1, Right = 5.
+            // Display Choices
             document.getElementById('opt-1-text').innerText = q.left;
             document.getElementById('opt-2-text').innerText = q.right;
+        }
+
+        // New Interaction Logic: Select Side -> Show Intensity
+        function selectSide(side) {
+            selectedSide = side;
+            const leftCard = document.getElementById('card-left');
+            const rightCard = document.getElementById('card-right');
+            
+            if(side === 'left') {
+                leftCard.classList.add('selected');
+                leftCard.classList.remove('bg-white');
+                rightCard.classList.remove('selected');
+                rightCard.classList.add('bg-white', 'opacity-50', 'scale-95');
+            } else {
+                rightCard.classList.add('selected');
+                rightCard.classList.remove('bg-white');
+                leftCard.classList.remove('selected');
+                leftCard.classList.add('bg-white', 'opacity-50', 'scale-95');
+            }
+            
+            // Reveal Intensity Buttons
+            document.getElementById('intensity-selector').classList.remove('hidden');
+        }
+
+        function confirmAnswer(intensity) {
+            // Intensity input is 5 (Strong), 4 (Lean), 3 (Neutral)
+            // If selectedSide is 'left' (Option A), math is:
+            //   Strongly A = 1
+            //   Lean A = 2
+            // If selectedSide is 'right' (Option B), math is:
+            //   Lean B = 4
+            //   Strongly B = 5
+            
+            let finalScore = 3;
+            if(intensity === 3) finalScore = 3;
+            else if(selectedSide === 'left') {
+                finalScore = intensity === 5 ? 1 : 2;
+            } else if(selectedSide === 'right') {
+                finalScore = intensity === 5 ? 5 : 4;
+            }
+
+            handleAnswer(finalScore);
         }
 
         function handleAnswer(score) {
@@ -687,10 +704,6 @@
         }
 
         function calculateResults() {
-            // Determine Code based on 12 questions per dim.
-            // Max Score = 60. Midpoint = 36.
-            // Low Score (<36) = Left Letter. High Score (>36) = Right Letter.
-            
             const getChar = (dim, leftChar, rightChar) => {
                 return quizResults[dim] > 36 ? rightChar : leftChar;
             };
@@ -713,7 +726,6 @@
             document.getElementById('result-code-final').innerText = userCode;
             document.getElementById('user-code-display').innerText = userCode;
             
-            // Assign Archetype Name
             const names = {
                 'CSFE': 'The Philosopher King',
                 'AKDV': 'The Happy Engineer',
@@ -734,9 +746,7 @@
 
         function calculateMatch(student, school) {
             let score = 0;
-            // Compare first 4
             for(let i=0; i<4; i++) if(student[i] === school[i]) score++;
-            // Compare last 2
             if(student[5] === school[5]) score++;
             if(student[6] === school[6]) score++;
             return score;
